@@ -15,19 +15,33 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import {Picker} from '@react-native-picker/picker';
 
 const Add = () => {
-    const [amount, setAmount] = useState('');
-    const [date, setDate] = useState(new Date());
+    const [amount, setAmount] = useState(''); // amount state
+    const [date, setDate] = useState(new Date()); // date state
+    const [dateShow, setDateShow] = useState(false); // date show state
 
-    const [category, setCategory] = useState('');
+    const [category, setCategory] = useState('undefined'); // category state
 
+    // handle add expense button press
     const HandleButtonPress = () => {
         console.log('Button Pressed');
     }
+    
 
+    // handle open date picker
+    const showDatepicker = () => {
+        if (Platform.OS === 'android') {
+            setDateShow(true);
+        }        
+    };
+
+    // handle Date change
     const handleDateChange = (event, selectedDate) => {
         const currentDate = selectedDate || date;
+        if (Platform.OS === 'android') {
+            setDateShow(false);
+        }
         setDate(currentDate);
-        console.log(currentDate);
+
     }
 
     const handleCategoryChange = (selectedCategory) => {
@@ -51,12 +65,25 @@ const Add = () => {
                     <View style={styles.date}>
 
                     <Text>Date:</Text>
-                    <DateTimePicker
+
+                    {Platform.OS === 'android' && 
+                    <TouchableOpacity 
+                    
+                    onPress={showDatepicker}>
+                
+                    <Text style={styles.dateText}>{date.toDateString()}</Text>        
+                    
+                    </TouchableOpacity>
+                    }
+
+                    {(dateShow || Platform.OS === 'ios') && 
+                    (<DateTimePicker
                         value={date}
                         mode="date"
                         display="calendar"
                         onChange={handleDateChange}
-                    />
+                    />)
+                    }
                     </View>
 
 
@@ -68,22 +95,15 @@ const Add = () => {
                             itemStyle={{ height: 120 }}
                             onValueChange={handleCategoryChange}
                             >
-                            <Picker.Item label="undefined" value="undefined" />
-                            <Picker.Item label="Category 1" value="Category 1" />
-                            <Picker.Item label="Category 2" value="Category 2" />
-                            <Picker.Item label="Category 3" value="Category 3" />
-                            <Picker.Item label="Category 4" value="Category 4" />
-                            <Picker.Item label="Category 5" value="Category 5" />
-                            <Picker.Item label="Category 6" value="Category 6" />
-                            <Picker.Item label="Category 7" value="Category 7" />
-                            <Picker.Item label="Category 8" value="Category 8" />
+                            <Picker.Item style={styles.pickerItem} label="undefined" value="undefined" />
+                            <Picker.Item style={styles.pickerItem} label="Category 1" value="Category 1" />
+                            <Picker.Item style={styles.pickerItem} label="Category 2" value="Category 2" />
                         </Picker>
                     </View>
 
-
-                    <View style={styles.btnContainer}>
+                    <TouchableOpacity style={styles.btnContainer}>
                         <Button title="Add Expense" color="black" onPress={HandleButtonPress}/>
-                    </View>
+                    </TouchableOpacity>
 
                 </View>
             </KeyboardAvoidingView>
@@ -108,11 +128,17 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginBottom: 12,
     },
+    dateText: {
+        color: '#007AFF',
+    },
     category: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 12,
+    },
+    pickerItem:{
+        fontSize: 16,
     },
     textInput: {
       height: 40,
