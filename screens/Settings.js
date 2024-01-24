@@ -1,7 +1,7 @@
 import { View, Alert } from 'react-native';
 import React from 'react'
 import ListItem from '../components/ListItem';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Settings = () => {
 
@@ -12,8 +12,17 @@ const Settings = () => {
         onPress: () => console.log('Cancel Pressed'),
         style: 'cancel',
       },
-      {text: 'Confirm', onPress: () => console.log('OK Pressed')},
+      {text: 'Confirm', onPress: () => handleClearLocalStorage()},
     ]);
+
+    const handleClearLocalStorage = async () => {
+        try {
+          await AsyncStorage.removeItem('expenses');
+          console.log('Local storage "expenses" cleared successfully.');
+        } catch (error) {
+          console.error('Error clearing local storage:', error);
+        }
+    };
 
     return (    
         <View

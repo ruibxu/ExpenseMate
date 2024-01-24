@@ -10,22 +10,61 @@ import {
   Button,
   Keyboard,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {Picker} from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Add = () => {
-    const [amount, setAmount] = useState(''); // amount state
+
+    const [amount, setAmount] = useState(0); // amount state
     const [date, setDate] = useState(new Date()); // date state
     const [dateShow, setDateShow] = useState(false); // date show state
-
     const [category, setCategory] = useState('undefined'); // category state
 
     // handle add expense button press
-    const HandleButtonPress = () => {
-        console.log('Button Pressed');
+    const HandleButtonPress = async () => {
+        try {
+
+            if (amount <=0) {
+                // Show an alert if the amount is 0
+                Alert.alert('Alert', 'Amount should be greater than 0');
+                return; // Exit the function without saving data
+            }
+            if (!amount) {
+                // Show an alert if the amount is 0
+                Alert.alert('Alert', 'Please enter an amount');
+                return; // Exit the function without saving data
+            }
+
+
+            const expenseData = {
+              amount,
+              date: date.toLocaleDateString(), // Save date as a string
+              category,
+            };
+            // Retrieve existing data or initialize an empty array
+            const existingData = JSON.parse(await AsyncStorage.getItem('expenses')) || [];
+            // Add new expense data to the array
+            existingData.push(expenseData);
+            // Save the updated array back to local storage
+            await AsyncStorage.setItem('expenses', JSON.stringify(existingData));
+            console.log('Expense data saved:', expenseData);
+          } catch (error) {
+            console.error('Error saving expense data:', error);
+          }
     }
-    
+
+    // only for debugging, this will console log the stored data
+    const debugButtonPress = async () => {
+        try {
+            const storedData = await AsyncStorage.getItem('expenses');
+            console.log('Stored Data:', storedData);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
 
     // handle open date picker
     const showDatepicker = () => {
@@ -56,10 +95,10 @@ const Add = () => {
                 <View style={styles.inner}>
 
                     <TextInput 
-                      placeholder="Amount" 
-                      style={styles.textInput}
-                      value={amount}
-                      onChange={e => setAmount(e.target.value)}
+                        placeholder="Amount" 
+                        style={styles.textInput}
+                        value={amount}
+                        onChangeText={text => setAmount(text)} 
                     />
                     
                     <View style={styles.date}>
@@ -103,6 +142,10 @@ const Add = () => {
 
                     <TouchableOpacity style={styles.btnContainer}>
                         <Button title="Add Expense" color="black" onPress={HandleButtonPress}/>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity style={styles.btnContainer}>
+                        <Button title="Print Expense" color="black" onPress={debugButtonPress}/>
                     </TouchableOpacity>
 
                 </View>
