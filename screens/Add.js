@@ -16,9 +16,12 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import {Picker} from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { theme } from '../theme';
+import { TabBarIcon } from '../components/TabBarIcon';
+
 const Add = () => {
 
-    const [amount, setAmount] = useState(0); // amount state
+    const [amount, setAmount] = useState(""); // amount state
     const [date, setDate] = useState(new Date()); // date state
     const [dateShow, setDateShow] = useState(false); // date show state
     const [category, setCategory] = useState('undefined'); // category state
@@ -27,20 +30,24 @@ const Add = () => {
     const HandleButtonPress = async () => {
         try {
 
-            if (amount <=0) {
+            if (amount <= 0) {
                 // Show an alert if the amount is 0
                 Alert.alert('Alert', 'Amount should be greater than 0');
                 return; // Exit the function without saving data
             }
             if (!amount) {
-                // Show an alert if the amount is 0
+                // Show an alert if the amount is empty
                 Alert.alert('Alert', 'Please enter an amount');
                 return; // Exit the function without saving data
             }
-
+            if (isNaN(amount)) {
+                // Show an alert if the amount is not a number
+                Alert.alert('Alert', 'Please enter a valid amount');
+                return; // Exit the function without saving data
+            }
 
             const expenseData = {
-              amount,
+              amount: parseInt(amount),
               date: date.toLocaleDateString(), // Save date as a string
               category,
             };
@@ -158,7 +165,7 @@ const Add = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: theme.colors.background,
         padding: 16,
     },
     inner: {
@@ -185,13 +192,13 @@ const styles = StyleSheet.create({
     },
     textInput: {
       height: 40,
-      borderColor: '#000000',
+      borderColor: 'gray',
       borderBottomWidth: 1,
       marginBottom: 36,
     },
     btnContainer: {
-        backgroundColor: 'gray',
-        Color: 'black',
+        backgroundColor: 'white',
+        color: 'black',
         marginTop: 12,
     },
   });
