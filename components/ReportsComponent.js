@@ -1,6 +1,6 @@
 // ReportsScreen.js
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity , ScrollView} from 'react-native';
+import { View, Text, TouchableOpacity , ScrollView, StyleSheet} from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { Card, Title, Paragraph } from 'react-native-paper';
 import { Dimensions } from 'react-native';
