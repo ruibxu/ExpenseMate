@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   KeyboardAvoidingView,
@@ -17,14 +17,46 @@ import {Picker} from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { theme } from '../theme';
-import { TabBarIcon } from '../components/TabBarIcon';
+import uuid from 'react-native-uuid';
+
+
+// sample date modal for a expense
+// {
+//     _id: '1',
+//     amount: 100,
+//     date: '2021-05-20',
+//     category: {
+//       _id: '1',
+//       label: 'Food',
+//       color: '#ff0000',
+//     },
+//
+// }
+//
+
 
 const Add = () => {
 
     const [amount, setAmount] = useState(""); // amount state
     const [date, setDate] = useState(new Date()); // date state
     const [dateShow, setDateShow] = useState(false); // date show state
-    const [category, setCategory] = useState('undefined'); // category state
+    const [selectedCategoryId, setSelectedCategoryId] = useState(''); // category state
+    const [categories, setCategories] = useState([]); // categories state
+
+
+    useEffect(() => {
+        const getCategories = async () => {
+            try {
+                const existingCategories = JSON.parse(await AsyncStorage.getItem('categories')) || [];
+                setCategories(existingCategories);
+                setSelectedCategoryId(existingCategories[0]._id);
+            } catch (error) {
+                console.error('Error retrieving categories:', error);
+            }
+        };
+    
+        getCategories();
+    }, []);
 
     // handle add expense button press
     const HandleButtonPress = async () => {
@@ -46,10 +78,14 @@ const Add = () => {
                 return; // Exit the function without saving data
             }
 
+            const selectedCategory = categories.find((category) => category._id === selectedCategoryId);
+
+            
             const expenseData = {
+              _id: uuid.v4(),
               amount: parseInt(amount),
               date: date.toLocaleDateString(), // Save date as a string
-              category,
+              category: selectedCategory,
             };
             // Retrieve existing data or initialize an empty array
             const existingData = JSON.parse(await AsyncStorage.getItem('expenses')) || [];
@@ -58,6 +94,9 @@ const Add = () => {
             // Save the updated array back to local storage
             await AsyncStorage.setItem('expenses', JSON.stringify(existingData));
             console.log('Expense data saved:', expenseData);
+
+            setAmount(''); // Clear the amount field
+            setDate(new Date()); // Reset the date field
           } catch (error) {
             console.error('Error saving expense data:', error);
           }
@@ -89,70 +128,263 @@ const Add = () => {
         setDate(currentDate);
 
     }
-
-    const handleCategoryChange = (selectedCategory) => {
-        setCategory(selectedCategory);
-        console.log(selectedCategory);
-    };
+    
     
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <KeyboardAvoidingView style={styles.container}>
             
                 <View style={styles.inner}>
+                    <View
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                        }}
+                    >
+                        <View>
+                            <Text
+                                style={{
+                                    fontSize: 20,
+                                    marginBottom: 5,
+                                    color: theme.colors.text,
+                                }}
+                            >Amount:</Text>
+                            <TextInput 
+                                placeholder="Amount" 
+                                style={{
+                                    color: theme.colors.text,
+                                    borderColor: theme.colors.border,
+                                    borderWidth: 1,
+                                    borderRadius: 10,
+                                    marginBottom: 12,
+                                    padding: 10,
+                                    width: 150,
+                                    height: 50,
+                                    fontSize: 16,
+                                    backgroundColor: theme.colors.card,
+                                }}
+                                value={amount}
+                                onChangeText={text => setAmount(text)} 
+                                keyboardType="numeric"
+                                placeholderTextColor={theme.colors.placeholder}
+                            />
+                        </View>
+                        
+                        <View style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                        }}>
 
-                    <TextInput 
-                        placeholder="Amount" 
-                        style={styles.textInput}
-                        value={amount}
-                        onChangeText={text => setAmount(text)} 
-                    />
-                    
-                    <View style={styles.date}>
-
-                    <Text>Date:</Text>
-
-                    {Platform.OS === 'android' && 
-                    <TouchableOpacity 
-                    
-                    onPress={showDatepicker}>
-                
-                    <Text style={styles.dateText}>{date.toDateString()}</Text>        
-                    
-                    </TouchableOpacity>
-                    }
-
-                    {(dateShow || Platform.OS === 'ios') && 
-                    (<DateTimePicker
-                        value={date}
-                        mode="date"
-                        display="calendar"
-                        onChange={handleDateChange}
-                    />)
-                    }
-                    </View>
-
-
-                    <View style={styles.category}>
-                        <Text style={styles.label}>Category:</Text>
-                        <Picker
-                            selectedValue={category}
-                            style={{ height: 120, width: 200 }}
-                            itemStyle={{ height: 120 }}
-                            onValueChange={handleCategoryChange}
+                        
+                            <Text
+                                style={{
+                                    fontSize: 20,
+                                    marginBottom: 5,
+                                    color: theme.colors.text,
+                                }}
                             >
-                            <Picker.Item style={styles.pickerItem} label="undefined" value="undefined" />
-                            <Picker.Item style={styles.pickerItem} label="Category 1" value="Category 1" />
-                            <Picker.Item style={styles.pickerItem} label="Category 2" value="Category 2" />
-                        </Picker>
+                                Date:
+                            </Text>
+
+                            <View>
+                            {Platform.OS === 'ios' ? (
+                                <View
+                                  style={{
+                                    marginBottom: 12,
+                                    padding: 10,
+                                    width: 150,
+                                    height: 50,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    display: 'flex',
+                                    transform: [{ scaleX: 1.0 }, { scaleY: 1.0 }],
+                                  }}
+                                    
+                                >
+                                    <DateTimePicker
+                                    value={date}
+                                    mode="date"
+                                    display="calendar"
+                                    onChange={handleDateChange}
+                                    />
+                                </View>
+                            ) : (
+                                <>
+                                    <TouchableOpacity
+                                        onPress={showDatepicker}
+                                        style={{
+                                        borderColor: theme.colors.border,
+                                        borderWidth: 1,
+                                        borderRadius: 10,
+                                        marginBottom: 12,
+                                        padding: 10,
+                                        width: 150,
+                                        height: 50,
+                                        backgroundColor: theme.colors.card,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        }}
+                                    >
+                                        <Text style={{ fontSize: 16, color: theme.colors.primary }}>
+                                        {date.toDateString()}
+                                        </Text>
+                                    </TouchableOpacity>
+                                    {dateShow && (
+                                        <DateTimePicker
+                                        value={date}
+                                        mode="date"
+                                        display="calendar"
+                                        onChange={handleDateChange}
+                                        />
+                                    )}
+                                </>
+                            )}
+            
+                            </View>
+                        </View>
                     </View>
 
-                    <TouchableOpacity style={styles.btnContainer}>
-                        <Button title="Add Expense" color="black" onPress={HandleButtonPress}/>
+                    <View 
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                        }}
+                    >
+                        <Text 
+                            style={{
+                                fontSize: 20,
+                                marginBottom: 5,
+                                color: theme.colors.text,
+                            }}
+                        >Category:</Text>
+
+                        {
+                            Platform.OS === 'ios' ? (
+                        
+                            <Picker
+                                style={{    
+                                    height: 150,
+                                    width: '100%',
+                                    backgroundColor: theme.colors.card,
+                                    borderRadius: 10,
+                                    borderColor: theme.colors.border,
+                                    borderWidth: 1,
+                                    marginBottom: 20,
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                }}
+                                selectedValue={selectedCategoryId}
+                                
+                                itemStyle={{ 
+                                    height: 150,
+                                    color: theme.colors.text,
+                                }}
+                                onValueChange={
+                                    (itemValue, itemIndex) => setSelectedCategoryId(itemValue)
+                                }
+                                >
+                                {categories.map((category) => (
+                                    <Picker.Item 
+                                        key={category._id}
+                                        style={{
+                                            fontSize: 16,
+                                            color: theme.colors.text,
+                                        }} 
+                                        label={category.label} 
+                                        value={category._id} 
+                                    />
+                                ))}   
+                            </Picker>
+                            ) : (
+                                <Picker
+                                style={{    
+                                    height: 50,
+                                    width: '100%',
+                                    backgroundColor: theme.colors.card,
+                                    marginBottom: 20,
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    padding: 0, 
+                                    margin: 0,
+                                }}
+                                
+                                selectedValue={selectedCategoryId}
+                                itemStyle={{ 
+                                    height: 50,
+                                    color: theme.colors.text,
+                                    padding: 0, 
+                                    margin: 0,
+                                }}
+                                onValueChange={
+                                    (itemValue, itemIndex) => {
+                                        console.log(itemValue);
+                                        setSelectedCategoryId(itemValue)
+                                    }
+                                }
+                                >
+                                {categories.map((category) => (
+                                    <Picker.Item 
+                                        key={category._id}
+                                        style={{
+                                            fontSize: 16,
+                                            color: theme.colors.text,
+                                            backgroundColor: theme.colors.card,
+                                            padding: 0, 
+                                            margin: 0,
+                                        }} 
+                                        label={category.label} 
+                                        value={category._id} 
+                                    />
+                                ))}       
+                            </Picker>
+                            )
+                        }
+                    </View>
+
+                    <TouchableOpacity 
+                        style={{
+                            marginBottom: 12,
+                            marginTop: 20,
+                            backgroundColor: theme.colors.primary,
+                            borderRadius: 10,
+                            height: 50,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+
+                        }}
+                        onPress={HandleButtonPress}
+                    >
+                        <Text 
+                            style={{
+                                fontSize: 16,
+                                color: theme.colors.text,
+                            }}
+                            
+                        >Add Expense </Text>
                     </TouchableOpacity>
                     
-                    <TouchableOpacity style={styles.btnContainer}>
-                        <Button title="Print Expense" color="black" onPress={debugButtonPress}/>
+                    <TouchableOpacity                         
+                        style={{
+                        marginBottom: 12,
+                        backgroundColor: theme.colors.primary,
+                        borderRadius: 10,
+                        height: 50,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',}}
+                        onPress={debugButtonPress}
+                    >
+                        <Text
+                            style={{
+                                fontSize: 16,
+                                color: theme.colors.text,
+                            }}
+                           
+                        >Debug</Text>
                     </TouchableOpacity>
 
                 </View>
@@ -189,6 +421,8 @@ const styles = StyleSheet.create({
     },
     pickerItem:{
         fontSize: 16,
+        color: 'white',
+        backgroundColor: 'black',
     },
     textInput: {
       height: 40,
@@ -196,11 +430,7 @@ const styles = StyleSheet.create({
       borderBottomWidth: 1,
       marginBottom: 36,
     },
-    btnContainer: {
-        backgroundColor: 'white',
-        color: 'black',
-        marginTop: 12,
-    },
+
   });
 
   

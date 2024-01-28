@@ -14,67 +14,33 @@ import Categories  from './screens/Categories';
 
 import { theme } from './theme';
 import { TabBarIcon } from './components/TabBarIcon';
+import Home from './screens/Home';
 
-// create bottom tab navigator
-const Tab = createBottomTabNavigator();
-
+//create a stack navigator
 const Stack = createStackNavigator();
-
-function MyStack() {
-  return (
-    <Stack.Navigator
-    screenOptions={() => ({
-      headerStyle: {
-        backgroundColor: theme.colors.card,
-      },
-      headerTitleAlign: 'center',
-    })}>
-      <Stack.Screen name="Settings" component={Settings}  />
-      <Stack.Screen name="Categories" component={Categories} />
-    </Stack.Navigator>
-  );
-}
 
 export default function App() {
   return (
     // react navigation container
     <NavigationContainer theme={theme}>
       <StatusBar style="auto" />
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarStyle: {
-            backgroundColor: theme.colors.card,
-            borderTopWidth: 0,
-          },
+      <Stack.Navigator
+        screenOptions={({route}) => ({
           headerStyle: {
             backgroundColor: theme.colors.card,
           },
           headerTitleAlign: 'center',
-          tabBarIcon: () => <TabBarIcon name={route.name} />, 
-
         })}
       >
-        <Tab.Screen 
-          name="Expenses" 
-          component={Expenses} 
+        <Stack.Screen 
+          name="Home" 
+          component={Home}  
+          options={{ 
+            headerShown: false,
+          }}
         />
-        <Tab.Screen 
-          name="Reports" 
-          component={Reports} 
-        />
-
-        <Tab.Screen 
-          name="Add" 
-          component={Add} 
-        />
-
-        <Tab.Screen 
-          name="Settings2" 
-          component={MyStack}
-          options={{ headerShown: false, tabBarLabel: 'Settings' }}
-        />
-
-      </Tab.Navigator>
+        <Stack.Screen name="Categories" component={Categories} />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }

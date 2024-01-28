@@ -11,7 +11,7 @@ export const TabBarIcon = (props) => {
             return <AntDesign name="piechart" size={24} color={theme.colors.icons} />
         case 'Add':
             return <MaterialIcons name="add" size={33} color={theme.colors.icons}/>
-        case 'Settings2':
+        case 'Settings':
             return <Ionicons name="settings-sharp" size={24} color={theme.colors.icons} />
         default:
             return null;

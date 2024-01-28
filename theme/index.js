@@ -12,6 +12,7 @@ export const theme = {
         icons: '#9a99a1', // icons color
         error: '#FF0000', // error color
         modal: "#2d2d2d", // modal background color
+        placeholder: "#9a99a1", // placeholder color
     },
 
 };
