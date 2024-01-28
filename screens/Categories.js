@@ -15,8 +15,9 @@ import {
 } from 'react-native';
 import ListItem from '../components/ListItem';
 import { theme } from '../theme';
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useContext} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 import uuid from 'react-native-uuid';
 import {
@@ -27,12 +28,17 @@ import {
   } from 'react-native-safe-area-context';
 
 import ColorPicker from 'react-native-wheel-color-picker'
+import { EventEmitter } from 'events';
+
+export const eventEmitter = new EventEmitter();
 
 const Categories = ({}) => {
     const [categories, setCategories] = useState([]);
     const [newCategoryLabel, setNewCategoryLabel] = useState('');
     const [isModalVisible, setModalVisible] = useState(false);
     const [newCategoryColor, setNewCategoryColor] = useState('#000000');
+
+    
 
     const defaultCategories = [
         {
@@ -73,8 +79,6 @@ const Categories = ({}) => {
         
     ];
 
-    const insets = useSafeAreaInsets();
-
     const toggleModal = () => {
         setNewCategoryLabel('');
         setModalVisible(!isModalVisible);
@@ -102,6 +106,7 @@ const Categories = ({}) => {
           await AsyncStorage.setItem('categories', JSON.stringify(existingCategories));
           console.log('Category saved:', newCategory);
           setCategories(existingCategories);
+          eventEmitter.emit('categoriesUpdated');
           toggleModal();
         } catch (error) {
           console.error('Error saving category:', error);
@@ -118,9 +123,11 @@ const Categories = ({}) => {
                 // If no categories are found, use the default categories
                 await AsyncStorage.setItem('categories', JSON.stringify(defaultCategories));
                 setCategories(defaultCategories);
+                eventEmitter.emit('categoriesUpdated');
                 return;
             }
             setCategories(JSON.parse(categoriesFromStorage));
+            eventEmitter.emit('categoriesUpdated');
           } catch (error) {
             console.error('Error retrieving categories:', error);
           }
@@ -163,6 +170,7 @@ const Categories = ({}) => {
                                     await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
                                     console.log('Category deleted:', category);
                                     setCategories(updatedCategories);
+                                    eventEmitter.emit('categoriesUpdated');
                                 } catch (error) {
                                     console.error('Error deleting category:', error);
                                 }
@@ -188,7 +196,7 @@ const Categories = ({}) => {
             </KeyboardAvoidingView>
 
             
-            <Modal visible={isModalVisible}>
+            <Modal visible={isModalVisible} >
                 <TouchableOpacity
                     style={{
                         flex: 1,

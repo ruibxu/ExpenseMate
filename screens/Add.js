@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import {
   View,
   KeyboardAvoidingView,
@@ -11,13 +11,16 @@ import {
   Keyboard,
   TouchableOpacity,
   Alert,
+  useColorScheme,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {Picker} from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
 import { theme } from '../theme';
 import uuid from 'react-native-uuid';
+import { eventEmitter } from './Categories';
 
 
 // sample date modal for a expense
@@ -34,14 +37,14 @@ import uuid from 'react-native-uuid';
 // }
 //
 
-
 const Add = () => {
 
     const [amount, setAmount] = useState(""); // amount state
     const [date, setDate] = useState(new Date()); // date state
     const [dateShow, setDateShow] = useState(false); // date show state
     const [selectedCategoryId, setSelectedCategoryId] = useState(''); // category state
-    const [categories, setCategories] = useState([]); // categories state
+    const [categories, setCategories] = useState([]); // category state
+
 
 
     useEffect(() => {
@@ -54,8 +57,27 @@ const Add = () => {
                 console.error('Error retrieving categories:', error);
             }
         };
-    
         getCategories();
+    }, []);
+
+    useEffect(() => {
+        const getCategories = async () => {
+            try {
+                const existingCategories = JSON.parse(await AsyncStorage.getItem('categories')) || [];
+                setCategories(existingCategories);
+                setSelectedCategoryId(existingCategories[0]._id);
+            } catch (error) {
+                console.error('Error retrieving categories:', error);
+            }
+        };
+    
+        eventEmitter.on('categoriesUpdated', getCategories);
+
+        // Don't forget to unsubscribe when the component unmounts
+        return () => {
+          eventEmitter.off('categoriesUpdated', getCategories);
+        };
+
     }, []);
 
     // handle add expense button press
@@ -80,7 +102,7 @@ const Add = () => {
 
             const selectedCategory = categories.find((category) => category._id === selectedCategoryId);
 
-            
+
             const expenseData = {
               _id: uuid.v4(),
               amount: parseInt(amount),
@@ -241,7 +263,6 @@ const Add = () => {
                                     )}
                                 </>
                             )}
-            
                             </View>
                         </View>
                     </View>
@@ -283,7 +304,10 @@ const Add = () => {
                                     color: theme.colors.text,
                                 }}
                                 onValueChange={
-                                    (itemValue, itemIndex) => setSelectedCategoryId(itemValue)
+                                    (itemValue, itemIndex) => {
+                                        console.log(itemValue);
+                                        setSelectedCategoryId(itemValue)
+                                    }
                                 }
                                 >
                                 {categories.map((category) => (
@@ -299,47 +323,50 @@ const Add = () => {
                                 ))}   
                             </Picker>
                             ) : (
-                                <Picker
-                                style={{    
-                                    height: 50,
-                                    width: '100%',
-                                    backgroundColor: theme.colors.card,
-                                    marginBottom: 20,
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    padding: 0, 
-                                    margin: 0,
-                                }}
-                                
-                                selectedValue={selectedCategoryId}
-                                itemStyle={{ 
-                                    height: 50,
-                                    color: theme.colors.text,
-                                    padding: 0, 
-                                    margin: 0,
-                                }}
-                                onValueChange={
-                                    (itemValue, itemIndex) => {
-                                        console.log(itemValue);
-                                        setSelectedCategoryId(itemValue)
-                                    }
-                                }
+                                <View
+                                  style={{
+                                  }}
                                 >
-                                {categories.map((category) => (
-                                    <Picker.Item 
-                                        key={category._id}
-                                        style={{
-                                            fontSize: 16,
-                                            color: theme.colors.text,
-                                            backgroundColor: theme.colors.card,
-                                            padding: 0, 
-                                            margin: 0,
-                                        }} 
-                                        label={category.label} 
-                                        value={category._id} 
-                                    />
-                                ))}       
-                            </Picker>
+                                    <Picker
+                                    style={{    
+                                        height: 50,
+                                        width: '100%',
+                                        backgroundColor: theme.colors.card,
+                                        marginBottom: 20,
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        colorBackgroundFloating: theme.colors.card,
+                                    }}
+                                    dropdownIconColor= {theme.colors.text}
+                                    mode='dropdown'
+                                    
+                                    selectedValue={selectedCategoryId}
+                                    itemStyle={{ 
+                                        height: 50,
+                                        color: theme.colors.text,
+                                        
+                                    }}
+                                    onValueChange={
+                                        (itemValue, itemIndex) => {
+                                            console.log(itemValue);
+                                            setSelectedCategoryId(itemValue)
+                                        }
+                                    }
+                                    >
+                                    {categories.map((category) => (
+                                        <Picker.Item 
+                                            key={category._id}
+                                            style={{
+                                                fontSize: 16,
+                                                color: theme.colors.text,
+                                                backgroundColor: theme.colors.card,
+                                            }} 
+                                            label={category.label} 
+                                            value={category._id} 
+                                        />
+                                    ))}       
+                                </Picker>
+                            </View>
                             )
                         }
                     </View>

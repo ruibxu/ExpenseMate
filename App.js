@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React,{useState} from 'react';
 import { StyleSheet, Text, View, TextInput, SafeAreaView} from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer ,} from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import 'react-native-gesture-handler';
@@ -16,32 +16,35 @@ import { theme } from './theme';
 import { TabBarIcon } from './components/TabBarIcon';
 import Home from './screens/Home';
 
+
 //create a stack navigator
 const Stack = createStackNavigator();
 
 export default function App() {
+
+
   return (
     // react navigation container
-    <NavigationContainer theme={theme}>
-      <StatusBar style="auto" />
-      <Stack.Navigator
-        screenOptions={({route}) => ({
-          headerStyle: {
-            backgroundColor: theme.colors.card,
-          },
-          headerTitleAlign: 'center',
-        })}
-      >
-        <Stack.Screen 
-          name="Home" 
-          component={Home}  
-          options={{ 
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen name="Categories" component={Categories} />
-      </Stack.Navigator>
-    </NavigationContainer>
+      <NavigationContainer theme={theme}>
+        <StatusBar style="auto" />
+        <Stack.Navigator
+          screenOptions={({route}) => ({
+            headerStyle: {
+              backgroundColor: theme.colors.card,
+            },
+            headerTitleAlign: 'center',
+          })}
+        >
+          <Stack.Screen 
+            name="Home" 
+            component={Home}  
+            options={{ 
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen name="Categories" component={Categories} />
+        </Stack.Navigator>
+      </NavigationContainer>
   );
 }
 
