@@ -336,15 +336,17 @@ const Add = () => {
                                         display: 'flex',
                                         justifyContent: 'center',
                                         colorBackgroundFloating: theme.colors.card,
+                                        minHeight: 30,   
                                     }}
                                     dropdownIconColor= {theme.colors.text}
+
                                     mode='dropdown'
+                                    dropdownIconRippleColor= {theme.colors.modal}
                                     
                                     selectedValue={selectedCategoryId}
                                     itemStyle={{ 
                                         height: 50,
                                         color: theme.colors.text,
-                                        
                                     }}
                                     onValueChange={
                                         (itemValue, itemIndex) => {
