@@ -2,8 +2,10 @@ import { View, Alert } from 'react-native';
 import React from 'react'
 import ListItem from '../components/ListItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AntDesign } from '@expo/vector-icons';
+import { theme } from '../theme';
 
-const Settings = () => {
+const Settings = ({ navigation }) => {
 
     const createAlert = () =>
     Alert.alert('Clear your data', 'This will clear all your expense data, and this is irreversible', [
@@ -28,13 +30,21 @@ const Settings = () => {
         <View
             style={{
                 flexDirection: 'column',
-                marginBottom: 16,
+                margin: 16,
+                borderRadius: 20,
+                overflow: 'hidden',
             }}>
-
             <ListItem 
-                title="Clear Data" 
-                onPress={() => createAlert()} 
-                titleStyle={{ color: 'red' }} 
+                label="Categories"
+                detail={
+                  <AntDesign name="right" size={24} color= {theme.colors.text} style={{opacity: 0.5 }}/>
+                }
+                onPress={() => navigation.navigate('Categories')}
+            />
+            <ListItem 
+                label="Clear your data"
+                onPress={createAlert}
+                isDestructive
             />
 
         </View>
