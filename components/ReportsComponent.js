@@ -1,6 +1,6 @@
 // ReportsScreen.js
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity , ScrollView} from 'react-native';
+import { View, Text, TouchableOpacity , ScrollView, StyleSheet} from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { Card, Title, Paragraph } from 'react-native-paper';
 import { Dimensions } from 'react-native';
@@ -16,38 +16,37 @@ const ReportsScreen = () => {
     { id: 1, icon: '💡', name: 'Utilities', amount: '$200' },
     { id: 2, icon: '🍔', name: 'Food', amount: '$150' },
     { id: 3, icon: '🚗', name: 'Transportation', amount: '$100' },
-    // Add more expenses as needed
   ];
 
   const screenWidth = Dimensions.get('window').width;
 
   return (
     <ScrollView>
-        <View style={{ flex: 1 }}>
+        <View style={styles.container}>
          {/* Top Half */}
          <View >
-          <View style={{ flexDirection: 'column', backgroundColor: '#4da47d',  padding: 16 }}>
+          <View style={styles.topHalf}>
             <View>
-              <Text style={{ color: 'white', fontSize: 20 , paddingBottom: 15, textAlign:'center', fontWeight:'bold'}}>Expenditure Report</Text>
+              <Text style={styles.halfText}>Expenditure Report</Text>
             </View>
              
-            <View style={{ flexDirection: 'row',  justifyContent:'space-between',paddingBottom:10 }}>
+            <View style={styles.topHalfFilter}>
               {/* Dropdown for filter */}
               <TouchableOpacity onPress={() => handleFilterChange('monthly')}>
-                <Text style={{ color: 'white' }}>Monthly</Text>
+                <Text style={styles.textColor}>Monthly</Text>
               </TouchableOpacity>
 
 
               {/* Dots for Income and Expenses */}
-              <View style={{ flexDirection: 'row', alignItems: 'center',gap:5 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center',gap:2 }}>
-                  <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'white', marginRight: 5 }}></View>
-                  <Text style={{ color:'white' }}>Income</Text>
+              <View style={styles.topHalfDotsContainer}>
+                <View style={styles.dots}>
+                  <View style={styles.dotsText}></View>
+                  <Text style={styles.textColor}>Income</Text>
                 </View>
               
-                <View style={{ flexDirection: 'row', alignItems: 'center',gap:2 }}>
+                <View style={styles.dots}>
                   <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'yellow', marginRight: 5 }}></View>
-                  <Text style={{ color:'white' }}>Expenses</Text>
+                  <Text style={styles.textColor}>Expenses</Text>
                 </View>
               </View>
             
@@ -89,7 +88,7 @@ const ReportsScreen = () => {
             }}
             bezier
           />
-            <Card style={{ position: 'absolute', bottom: -60, left: 0, right: 0, margin: 16, zIndex: 1, backgroundColor:'white' }}>
+            <Card style={styles.currentMonthCard}>
               <Card.Content>
                 <Title>Current Month</Title>
                 <Paragraph>Income: $500</Paragraph>
@@ -135,3 +134,55 @@ const ReportsScreen = () => {
 };
 
 export default ReportsScreen;
+
+const styles = StyleSheet.create({
+  container:{
+    flex:1
+  },
+  topHalf:{
+    flexDirection: 'column', 
+    backgroundColor: '#4da47d',  
+    padding: 16
+  },
+  halfText:{
+    color: 'white', 
+    fontSize: 20 , 
+    paddingBottom: 15, 
+    textAlign:'center', 
+    fontWeight:'bold'
+  },
+  topHalfFilter:{
+    flexDirection: 'row',  
+    justifyContent:'space-between',
+    paddingBottom:10 
+  },
+  topHalfDotsContainer:{
+    flexDirection: 'row', 
+    alignItems: 'center',
+    gap:5
+  },
+  textColor:{
+    color:'white'
+  },
+  currentMonthCard:{
+    position: 'absolute', 
+    bottom: -60, 
+    left: 0, 
+    right: 0, 
+    margin: 16, 
+    zIndex: 1, 
+    backgroundColor:'white' 
+  },
+  dots:{
+    flexDirection: 'row', 
+    alignItems: 'center',
+    gap:2 
+  },
+  dotsText:{
+    width: 10, 
+    height: 10, 
+    borderRadius: 5, 
+    backgroundColor: 'white', 
+    marginRight: 5
+  },
+})
