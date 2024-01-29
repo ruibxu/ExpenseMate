@@ -4,7 +4,7 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { theme } from '../theme';
 import { useRef, useState } from 'react';
 
-const ListItem = ({ label, onPress, detail, swipeToDelete , onDelete, isDestructive}) => {
+const ListItem = ({ label, onPress, detail, swipeToDelete , onDelete, isDestructive,subtitle,percentage}) => {
 
   const [isDeletePressed, setIsDeletePressed] = useState(false)
 
@@ -25,6 +25,9 @@ const ListItem = ({ label, onPress, detail, swipeToDelete , onDelete, isDestruct
         <Text style={[styles.label, { color: isDestructive ? theme.colors.error : theme.colors.text }]}>
           {label}
         </Text>
+        <Text style={[styles.label, { color: isDestructive ? theme.colors.error : theme.colors.text }]}>{subtitle}</Text>
+        <Text style={[styles.label, { color: isDestructive ? theme.colors.error : theme.colors.text }]}>{percentage}</Text>
+
         {detail}
       </TouchableOpacity>
     );
