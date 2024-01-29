@@ -19,65 +19,21 @@ import { useState, useEffect,useContext} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-import uuid from 'react-native-uuid';
-import {
-    SafeAreaView,
-    SafeAreaProvider,
-    SafeAreaInsetsContext,
-    useSafeAreaInsets,
-  } from 'react-native-safe-area-context';
 
 import ColorPicker from 'react-native-wheel-color-picker'
 import { EventEmitter } from 'events';
 
 export const eventEmitter = new EventEmitter();
 
+import { CategoryContext } from '../context/CategoryContext';
+
 const Categories = ({}) => {
-    const [categories, setCategories] = useState([]);
     const [newCategoryLabel, setNewCategoryLabel] = useState('');
     const [isModalVisible, setModalVisible] = useState(false);
     const [newCategoryColor, setNewCategoryColor] = useState('#000000');
 
-    
+    const { categories, setCategories, addCategory, deleteCategory } = useContext(CategoryContext);
 
-    const defaultCategories = [
-        {
-            _id: uuid.v4(),
-            label: "Food",
-            color: "#e04dab",
-        },
-        {
-            _id: uuid.v4(),
-            label: "Housing",
-            color: "#f74b47",
-        },
-        {
-            _id: uuid.v4(),
-            label: "Health",
-            color: "#08fb9a",
-        },
-        {
-            _id: uuid.v4(),
-            label: "Transportation",
-            color: "#8657de",
-        },
-        {
-            _id: uuid.v4(),
-            label: "Shopping",
-            color: "#19daf8",
-        },
-        {
-            _id: uuid.v4(),
-            label: "Entertainment",
-            color: "#2254b6",
-        },
-        {
-            _id: uuid.v4(),
-            label: "Other",
-            color: "#ffde5d",
-        },
-        
-    ];
 
     const toggleModal = () => {
         setNewCategoryLabel('');
@@ -85,55 +41,9 @@ const Categories = ({}) => {
     };
 
     const handleAddCategory = async () => {
-        try {
-          // Retrieve existing categories or initialize an empty array
-          const existingCategories = JSON.parse(await AsyncStorage.getItem('categories')) || [];
-
-            if (!newCategoryLabel) {
-                // Show an alert if the category is empty
-                Alert.alert('Alert', 'Please enter a category');
-                return; // Exit the function without saving data
-            }
-          // Add new category to the array
-          const newCategory = {  
-            _id: uuid.v4(),
-            label: newCategoryLabel,
-            color: newCategoryColor,
-          };
-
-          existingCategories.push(newCategory);
-          // Save the updated array back to local storage
-          await AsyncStorage.setItem('categories', JSON.stringify(existingCategories));
-          console.log('Category saved:', newCategory);
-          setCategories(existingCategories);
-          eventEmitter.emit('categoriesUpdated');
-          toggleModal();
-        } catch (error) {
-          console.error('Error saving category:', error);
-        }
-      }
-
-    useEffect(() => {
-        const getCategoriesFromStorage = async () => {
-          try {
-            // Retrieve categories from local storage
-            const categoriesFromStorage = await AsyncStorage.getItem('categories');
-            console.log('Categories from storage:', categoriesFromStorage);
-            if (!categoriesFromStorage || JSON.parse(categoriesFromStorage).length === 0) {
-                // If no categories are found, use the default categories
-                await AsyncStorage.setItem('categories', JSON.stringify(defaultCategories));
-                setCategories(defaultCategories);
-                eventEmitter.emit('categoriesUpdated');
-                return;
-            }
-            setCategories(JSON.parse(categoriesFromStorage));
-            eventEmitter.emit('categoriesUpdated');
-          } catch (error) {
-            console.error('Error retrieving categories:', error);
-          }
-        };
-        getCategoriesFromStorage();
-      }, []);
+        await addCategory(newCategoryLabel, newCategoryColor);
+        toggleModal();
+    }
 
     return (
         <>
@@ -161,19 +71,7 @@ const Categories = ({}) => {
                             }
                             swipeToDelete={true}
                             onDelete={async () => {
-                                try {
-                                    // Retrieve existing categories or initialize an empty array
-                                    const existingCategories = JSON.parse(await AsyncStorage.getItem('categories')) || [];
-                                    // Remove the category from the array
-                                    const updatedCategories = existingCategories.filter((item) => item._id !== category._id);
-                                    // Save the updated array back to local storage
-                                    await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
-                                    console.log('Category deleted:', category);
-                                    setCategories(updatedCategories);
-                                    eventEmitter.emit('categoriesUpdated');
-                                } catch (error) {
-                                    console.error('Error deleting category:', error);
-                                }
+                                await deleteCategory(category._id);
                             }}
                             />
                         ))
