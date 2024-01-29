@@ -20,8 +20,8 @@ import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
 import { theme } from '../theme';
 import uuid from 'react-native-uuid';
-import { eventEmitter } from './Categories';
 
+import { CategoryContext } from '../context/CategoryContext';
 
 // sample date modal for a expense
 // {
@@ -43,42 +43,14 @@ const Add = () => {
     const [date, setDate] = useState(new Date()); // date state
     const [dateShow, setDateShow] = useState(false); // date show state
     const [selectedCategoryId, setSelectedCategoryId] = useState(''); // category state
-    const [categories, setCategories] = useState([]); // category state
+    const { categories, setCategories, addCategory, deleteCategory } = useContext(CategoryContext);
 
 
-
-    useEffect(() => {
-        const getCategories = async () => {
-            try {
-                const existingCategories = JSON.parse(await AsyncStorage.getItem('categories')) || [];
-                setCategories(existingCategories);
-                setSelectedCategoryId(existingCategories[0]._id);
-            } catch (error) {
-                console.error('Error retrieving categories:', error);
-            }
-        };
-        getCategories();
-    }, []);
-
-    useEffect(() => {
-        const getCategories = async () => {
-            try {
-                const existingCategories = JSON.parse(await AsyncStorage.getItem('categories')) || [];
-                setCategories(existingCategories);
-                setSelectedCategoryId(existingCategories[0]._id);
-            } catch (error) {
-                console.error('Error retrieving categories:', error);
-            }
-        };
-    
-        eventEmitter.on('categoriesUpdated', getCategories);
-
-        // Don't forget to unsubscribe when the component unmounts
-        return () => {
-          eventEmitter.off('categoriesUpdated', getCategories);
-        };
-
-    }, []);
+     useEffect(() => {
+        if (categories.length > 0) {
+            setSelectedCategoryId(categories[0]._id);
+        }
+    }, [categories]);
 
     // handle add expense button press
     const HandleButtonPress = async () => {
@@ -101,7 +73,6 @@ const Add = () => {
             }
 
             const selectedCategory = categories.find((category) => category._id === selectedCategoryId);
-
 
             const expenseData = {
               _id: uuid.v4(),

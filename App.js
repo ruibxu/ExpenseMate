@@ -16,6 +16,8 @@ import { theme } from './theme';
 import { TabBarIcon } from './components/TabBarIcon';
 import Home from './screens/Home';
 
+import { CategoryProvider } from './context/CategoryContext';
+
 
 //create a stack navigator
 const Stack = createStackNavigator();
@@ -25,6 +27,7 @@ export default function App() {
 
   return (
     // react navigation container
+    <CategoryProvider>
       <NavigationContainer theme={theme}>
         <StatusBar style="auto" />
         <Stack.Navigator
@@ -45,6 +48,7 @@ export default function App() {
           <Stack.Screen name="Categories" component={Categories} />
         </Stack.Navigator>
       </NavigationContainer>
+    </CategoryProvider>
   );
 }
 
