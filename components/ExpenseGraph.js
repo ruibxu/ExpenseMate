@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, Dimensions, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+  StyleSheet,
+} from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import {
   startOfWeek,
@@ -21,8 +27,8 @@ const ExpenseGraph = ({ data }) => {
   const currentYear = new Date().getFullYear(); // Obtener el año actual
 
   const chartConfig = {
-    backgroundGradientFrom: "#4da47d",
-    backgroundGradientTo: "#4da47d",
+    backgroundGradientFrom: "#020014",
+    backgroundGradientTo: "#020014",
     decimalPlaces: 2,
     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     style: {
@@ -34,12 +40,11 @@ const ExpenseGraph = ({ data }) => {
     setPeriod("month");
   }, []);
 
-
   const organizeData = (expenseData, period) => {
     let groupedData = {};
 
     expenseData.forEach((expense) => {
-      let date = new Date(expense.fecha);
+      let date = new Date(expense.date);
       let key;
 
       switch (period) {
@@ -112,7 +117,7 @@ const ExpenseGraph = ({ data }) => {
         style={{
           flexDirection: "row",
           justifyContent: "space-evenly",
-          padding: 16,
+          marginBottom: 25
         }}
       >
         <TouchableOpacity
@@ -130,7 +135,8 @@ const ExpenseGraph = ({ data }) => {
           <Text style={styles.textButton}>Year</Text>
         </TouchableOpacity>
       </View>
-      <View>
+      <Text>feb</Text>
+      <View style={styles.container}>
         <LineChart
           data={{
             labels: chartData.map((dataPoint) =>
@@ -144,7 +150,7 @@ const ExpenseGraph = ({ data }) => {
               {
                 data: chartData.map((dataPoint) =>
                   dataPoint.expenses.reduce(
-                    (sum, expense) => sum + expense.monto,
+                    (sum, expense) => sum + expense.amount,
                     0
                   )
                 ),
@@ -165,7 +171,7 @@ const ExpenseGraph = ({ data }) => {
             (total, dataPoint) =>
               total +
               dataPoint.expenses.reduce(
-                (sum, expense) => sum + expense.monto,
+                (sum, expense) => sum + expense.amount,
                 0
               ),
             0
@@ -194,8 +200,11 @@ const styles = StyleSheet.create({
   textButton: {
     color: "#FFFFFF",
     textTransform: "uppercase",
-    fontSize: "20px"
+    fontSize: "20px",
   },
+  container: {
+    overflow: "hidden",
+  }
 });
 
 export default ExpenseGraph;
