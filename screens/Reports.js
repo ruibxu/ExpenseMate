@@ -12,16 +12,44 @@ import { PieChart } from "react-native-chart-kit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ListItem from "../components/ListItem";
 import { theme } from "../theme";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { Picker } from "@react-native-picker/picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
 const ReportScreen = () => {
   const [expenses, setExpenses] = useState([]);
-  const [date, setDate] = useState(new Date()); // date state
-  const [dateShow, setDateShow] = useState(false); // date show state
+  // Initialize state for selected month and year
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // Get current month (January is 0, so add 1)
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); // Get current year
+
+  // Function to handle month selection
+  const handleMonthSelect = (month) => {
+    setSelectedMonth(month);
+  };
+
+  // Function to handle year selection
+  const handleYearSelect = (year) => {
+    setSelectedYear(year);
+  };
+
+  // Function to get month name from month number
+  const getMonthName = (monthNumber) => {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return months[monthNumber - 1];
+  };
 
   useEffect(() => {
     // Function to retrieve expenses data from local storage
@@ -110,34 +138,7 @@ const ReportScreen = () => {
   const categorySummary = calculateCategorySummary();
   console.log(categorySummary);
 
-  // filtering
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [filteredCategorySummary, setFilteredCategorySummary] =
-    useState(categorySummary);
-
-  const filterCategoryByDate = () => {
-    const filteredCategories = Object.keys(categorySummary).reduce(
-      (acc, category) => {
-        const categoryDate = new Date(categorySummary[category].date);
-        const startDateObj = startDate ? new Date(startDate) : null;
-        const endDateObj = endDate ? new Date(endDate) : null;
-
-        if (
-          (!startDateObj || categoryDate >= startDateObj) &&
-          (!endDateObj || categoryDate <= endDateObj)
-        ) {
-          acc[category] = categorySummary[category];
-        }
-
-        return acc;
-      },
-      {}
-    );
-
-    setFilteredCategorySummary(filteredCategories);
-  };
-
+ 
   return (
     <ScrollView>
       <View style={{ flex: 1 }}>
@@ -169,16 +170,26 @@ const ReportScreen = () => {
         </View>
 
         <View style={styles.filterContainer}>
-          <Text style={styles.header}>JANUARY 2024</Text>
-          <MaterialCommunityIcons
-            name="calendar-search"
-            size={34}
-            color="white"
-          />
+          <Text style={styles.header}>{`${getMonthName(
+            selectedMonth
+          )} ${selectedYear}`}</Text>
+          <TouchableOpacity onPress={() => handleMonthSelect(selectedMonth + 1)}>
+            <MaterialCommunityIcons
+              name="calendar-search"
+              size={34}
+              color="white"
+            />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.summary}>
-          <View style={{ flexDirection:'column',alignItems:'center',paddingTop:15 }}>
+          <View
+            style={{
+              flexDirection: "column",
+              alignItems: "center",
+              paddingTop: 15,
+            }}
+          >
             <View style={styles.line}></View>
             <Text style={styles.header}>SUMMARY</Text>
           </View>
@@ -268,10 +279,10 @@ const styles = StyleSheet.create({
   },
   line: {
     height: 5,
-    width: 60, 
-    backgroundColor: "#ccc", 
+    width: 60,
+    backgroundColor: "#ccc",
     marginBottom: 5,
-    borderRadius:5
+    borderRadius: 5,
   },
   container: {
     padding: 10,
