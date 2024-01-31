@@ -220,7 +220,7 @@ const Add = () => {
                                         alignItems: 'center',
                                         }}
                                     >
-                                        <Text style={{ fontSize: 16, color: theme.colors.primary }}>
+                                        <Text style={{ fontSize: 16, color: theme.colors.activeText }}>
                                         {date.toDateString()}
                                         </Text>
                                     </TouchableOpacity>
