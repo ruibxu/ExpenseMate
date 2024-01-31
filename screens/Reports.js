@@ -19,8 +19,8 @@ const { width } = Dimensions.get("window");
 const ReportScreen = () => {
   const [expenses, setExpenses] = useState([]);
   // Initialize state for selected month and year
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // Get current month (January is 0, so add 1)
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); // Get current year
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); 
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); 
 
   // Function to handle month selection
   const handleMonthSelect = (month) => {
@@ -55,7 +55,7 @@ const ReportScreen = () => {
     // Function to retrieve expenses data from local storage
     const fetchExpenses = async () => {
       try {
-        // Fetch expenses data from local storage (implement your own logic)
+  
         const expensesData = await AsyncStorage.getItem("expenses");
         if (expensesData) {
           const parsedExpenses = JSON.parse(expensesData);
@@ -160,9 +160,9 @@ const ReportScreen = () => {
               accessor="value"
               backgroundColor="transparent"
               paddingLeft="15"
-              hasLegend={true} // Enable legend to make the chart a doughnut chart
-              center={[10, 10]} // Adjust the center to create a doughnut chart effect
-              absolute // Render values as absolute numbers
+              hasLegend={true} 
+              center={[10, 10]}
+              absolute 
             />
           ) : (
             <Text>No expenses data available</Text>
@@ -250,20 +250,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
   },
-  labelContainer: {
-    flex: 1, // Make label take up remaining space
-    marginRight: 10,
-    width: 200,
-    // Add some margin between label and other items
-  },
-  subtitleContainer: {
-    width: 10, // Set a fixed width for subtitle
-    textAlign: "center", // Center-align subtitle content
-  },
-  percentageContainer: {
-    width: 100, // Set a fixed width for percentage
-    textAlign: "right", // Right-align percentage content
-  },
+ 
   summary: {
     borderRadius: 40,
     backgroundColor: theme.colors.card,
@@ -293,33 +280,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
-  dateInput: {
-    flex: 1,
-    color: "white",
-    marginRight: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-  },
-  filterButton: {
-    backgroundColor: "#4CAF50",
-    padding: 10,
-    borderRadius: 5,
-    justifyContent: "center",
-  },
-  filterButtonText: {
-    color: "#fff",
-    textAlign: "center",
-  },
-  categoryItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    paddingVertical: 10,
-  },
+ 
 });
 
 export default ReportScreen;
