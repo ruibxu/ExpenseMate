@@ -189,7 +189,7 @@ const ReportScreen = () => {
           )}
         </View>
       )}
-
+            <Text style={{ color:'white',textAlign:'center',paddingBottom:35,fontSize:20 }}>Total: $3425</Text>
       {/* Render the summary view */}
       <TouchableOpacity onPress={toggleSummary} >
         <View style={[styles.summary, summaryExpanded && styles.expandedSummary]}>
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   summary: {
     borderRadius: 40,
     backgroundColor: theme.colors.card,
-    paddingBottom: 20,
+    paddingBottom: 80,
     borderWidth: 1,
     borderColor: "white",
     borderTopWidth: 1,
