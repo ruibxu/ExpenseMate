@@ -4,11 +4,11 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { theme } from '../theme';
 import { useRef, useState } from 'react';
 
-const ListItem = ({ label, onPress, detail, swipeToDelete , onDelete, isDestructive,subtitle,percentage}) => {
+const ListItem = ({ label, onPress, detail, swipeToDelete , onDelete, isDestructive,subtitle,percentage,}) => {
 
   const [isDeletePressed, setIsDeletePressed] = useState(false)
 
-  const swipeableRef = useRef(null);
+  const swipeableRef = useRef(null)
 
   const item = () => {
     return (
@@ -22,11 +22,11 @@ const ListItem = ({ label, onPress, detail, swipeToDelete , onDelete, isDestruct
           },
         ]}
       >
-        <Text style={[styles.label, { color: isDestructive ? theme.colors.error : theme.colors.text }]}>
+        <Text style={[styles.label, { color: isDestructive ? theme.colors.error : theme.colors.text,width:150}]}>
           {label}
         </Text>
-        <Text style={[styles.label, { color: isDestructive ? theme.colors.error : theme.colors.text }]}>{subtitle}</Text>
-        <Text style={[styles.label, { color: isDestructive ? theme.colors.error : theme.colors.text }]}>{percentage}</Text>
+        <Text style={[styles.label, { color: isDestructive ? theme.colors.error : theme.colors.text,width:120 }]}>{subtitle}</Text>
+        <Text style={[styles.label, { color: isDestructive ? theme.colors.error : theme.colors.text ,width:55}]}>{percentage}</Text>
 
         {detail}
       </TouchableOpacity>
@@ -86,6 +86,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
+    
   }
 });
   

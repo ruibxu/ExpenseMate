@@ -12,11 +12,16 @@ import { PieChart } from "react-native-chart-kit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ListItem from "../components/ListItem";
 import { theme } from "../theme";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
 const ReportScreen = () => {
   const [expenses, setExpenses] = useState([]);
+  const [date, setDate] = useState(new Date()); // date state
+  const [dateShow, setDateShow] = useState(false); // date show state
 
   useEffect(() => {
     // Function to retrieve expenses data from local storage
@@ -163,47 +168,26 @@ const ReportScreen = () => {
           )}
         </View>
 
-        <ScrollView>
-          <View style={styles.container}>
-            <View style={styles.filterContainer}>
-              <TextInput
-                style={styles.dateInput}
-                placeholder="Start Date (MM/DD/YYYY)"
-                onChangeText={(text) => setStartDate(text)}
-              />
-              <TextInput
-                style={styles.dateInput}
-                placeholder="End Date (MM/DD/YYYY)"
-                onChangeText={(text) => setEndDate(text)}
-              />
-              <TouchableOpacity
-                style={styles.filterButton}
-                onPress={filterCategoryByDate}
-              >
-                <Text style={styles.filterButtonText}>Filter</Text>
-              </TouchableOpacity>
-            </View>
-
-            {Object.keys(filteredCategorySummary).map((category) => (
-              <View key={category} style={styles.categoryItem}>
-                <Text
-                  style={{ color: filteredCategorySummary[category].color }}
-                >
-                  {category}
-                </Text>
-                <Text>{`$ ${filteredCategorySummary[category].value.toFixed(
-                  2
-                )}`}</Text>
-                <Text>{`${filteredCategorySummary[category].percentage.toFixed(
-                  2
-                )}%`}</Text>
-              </View>
-            ))}
-          </View>
-        </ScrollView>
+        <View style={styles.filterContainer}>
+          <Text style={styles.header}>JANUARY 2024</Text>
+          <MaterialCommunityIcons
+            name="calendar-search"
+            size={34}
+            color="white"
+          />
+        </View>
 
         <View style={styles.summary}>
-          <Text style={styles.header}>SUMMARY</Text>
+          <View style={{ flexDirection:'column',alignItems:'center',paddingTop:15 }}>
+            <View style={styles.line}></View>
+            <Text style={styles.header}>SUMMARY</Text>
+          </View>
+
+          <View style={styles.titleArrange}>
+            <Text style={styles.title}>Category</Text>
+            <Text style={styles.title}>Percentage</Text>
+            <Text style={styles.title}>Amount</Text>
+          </View>
           <ScrollView>
             <View>
               {Object.keys(categorySummary).map((category) => (
@@ -211,7 +195,12 @@ const ReportScreen = () => {
                   key={category}
                   detail={<Text></Text>}
                   label={
-                    <Text style={{ color: categorySummary[category].color }}>
+                    <Text
+                      style={{
+                        color: categorySummary[category].color,
+                        width: 120,
+                      }}
+                    >
                       {category}
                     </Text>
                   }
@@ -240,6 +229,30 @@ const styles = StyleSheet.create({
     textAlign: "center",
     padding: 14,
   },
+  title: {
+    color: "white",
+    fontSize: 18,
+  },
+  titleArrange: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 16,
+  },
+  labelContainer: {
+    flex: 1, // Make label take up remaining space
+    marginRight: 10,
+    width: 200,
+    // Add some margin between label and other items
+  },
+  subtitleContainer: {
+    width: 10, // Set a fixed width for subtitle
+    textAlign: "center", // Center-align subtitle content
+  },
+  percentageContainer: {
+    width: 100, // Set a fixed width for percentage
+    textAlign: "right", // Right-align percentage content
+  },
   summary: {
     borderRadius: 40,
     backgroundColor: theme.colors.card,
@@ -253,16 +266,25 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: "white",
   },
+  line: {
+    height: 5,
+    width: 60, 
+    backgroundColor: "#ccc", 
+    marginBottom: 5,
+    borderRadius:5
+  },
   container: {
     padding: 10,
   },
   filterContainer: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 10,
   },
   dateInput: {
     flex: 1,
-    color:'white',
+    color: "white",
     marginRight: 10,
     padding: 10,
     borderWidth: 1,
