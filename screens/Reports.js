@@ -19,8 +19,8 @@ const { width } = Dimensions.get("window");
 const ReportScreen = () => {
   const [expenses, setExpenses] = useState([]);
   // Initialize state for selected month and year
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); 
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); 
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   // Function to handle month selection
   const handleMonthSelect = (month) => {
@@ -55,7 +55,6 @@ const ReportScreen = () => {
     // Function to retrieve expenses data from local storage
     const fetchExpenses = async () => {
       try {
-  
         const expensesData = await AsyncStorage.getItem("expenses");
         if (expensesData) {
           const parsedExpenses = JSON.parse(expensesData);
@@ -138,10 +137,31 @@ const ReportScreen = () => {
   const categorySummary = calculateCategorySummary();
   console.log(categorySummary);
 
- 
+  const [summaryExpanded, setSummaryExpanded] = useState(false);
+
+  // Define your handle function to toggle summary view
+  const toggleSummary = () => {
+    setSummaryExpanded(!summaryExpanded);
+  };
+
   return (
     <ScrollView>
-      <View style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
+      <View style={styles.filterContainer}>
+        <Text style={styles.header}>{`${getMonthName(
+          selectedMonth
+        )} ${selectedYear}`}</Text>
+        <TouchableOpacity onPress={() => handleMonthSelect(selectedMonth + 1)}>
+          <MaterialCommunityIcons
+            name="calendar-search"
+            size={34}
+            color="white"
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* Render the pie chart */}
+      {!summaryExpanded && (
         <View style={styles.piechart}>
           {expenses.length > 0 ? (
             <PieChart
@@ -168,21 +188,11 @@ const ReportScreen = () => {
             <Text>No expenses data available</Text>
           )}
         </View>
+      )}
 
-        <View style={styles.filterContainer}>
-          <Text style={styles.header}>{`${getMonthName(
-            selectedMonth
-          )} ${selectedYear}`}</Text>
-          <TouchableOpacity onPress={() => handleMonthSelect(selectedMonth + 1)}>
-            <MaterialCommunityIcons
-              name="calendar-search"
-              size={34}
-              color="white"
-            />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.summary}>
+      {/* Render the summary view */}
+      <TouchableOpacity onPress={toggleSummary} >
+        <View style={[styles.summary, summaryExpanded && styles.expandedSummary]}>
           <View
             style={{
               flexDirection: "column",
@@ -225,8 +235,9 @@ const ReportScreen = () => {
             </View>
           </ScrollView>
         </View>
-      </View>
-    </ScrollView>
+      </TouchableOpacity>
+    </View>
+  </ScrollView>
   );
 };
 
@@ -250,7 +261,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
   },
- 
+
   summary: {
     borderRadius: 40,
     backgroundColor: theme.colors.card,
@@ -280,7 +291,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
- 
 });
 
 export default ReportScreen;
