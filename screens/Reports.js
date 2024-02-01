@@ -24,7 +24,7 @@ const ReportScreen = () => {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: currentYear - 2019 }, (_, i) => 2020 + i);
   const [totalAmountSpent, setTotalAmountSpent] = useState(0);
-  const [categorySummary2, setCategorySummary] = useState({});
+  const [categorySummary, setCategorySummary] = useState({});
 
   // Function to handle month selection
   const handleMonthSelect = (month) => {
@@ -112,14 +112,13 @@ const ReportScreen = () => {
   };
 
   // Function to calculate total expenses and percentages by category
-  const calculateCategorySummary = () => {
+  const calculateCategorySummary = (filteredExpenses) => {
     const categorySummary = {};
     let totalExpense = 0;
-
+  
     // Calculate total expenses and expenses per category
-    expenses.forEach((expense) => {
+    filteredExpenses?.forEach((expense) => {
       const { category, amount } = expense;
-      console.log(expense);
       if (category && category.label) {
         totalExpense += amount;
         if (categorySummary[category.label]) {
@@ -133,18 +132,33 @@ const ReportScreen = () => {
         }
       }
     });
-
+  
     // Calculate percentage and add it to each category summary
     Object.keys(categorySummary).forEach((category) => {
       categorySummary[category].percentage =
         (categorySummary[category].value / totalExpense) * 100;
     });
-
+  
     return categorySummary;
   };
+  
+  useEffect(() => {
+    // Filter expenses by selected month and year
+    const filteredExpenses = expenses.filter(expense => {
+      const [month, day, year] = expense.date.split('/').map(Number);
+      return month === selectedMonth && year === selectedYear;
+    });
+  
+    // Calculate category summary for the filtered expenses
+    const newCategorySummary = calculateCategorySummary(filteredExpenses);
+  
+    // Update category summary state
+    setCategorySummary(newCategorySummary);
+  }, [expenses, selectedMonth, selectedYear]);
+  
 
-  const categorySummary = calculateCategorySummary();
-  console.log(categorySummary);
+  const categorySummaryLength = Object.keys(categorySummary).length;
+
 
   useEffect(() => {
     // Filter expenses by selected month and year
@@ -262,6 +276,7 @@ const ReportScreen = () => {
         </Text>
         {/* Render the summary view */}
         <TouchableOpacity onPress={toggleSummary}>
+        {categorySummaryLength > 0 ? (
           <View
             style={[styles.summary, summaryExpanded && styles.expandedSummary]}
           >
@@ -307,6 +322,9 @@ const ReportScreen = () => {
               </View>
             </ScrollView>
           </View>
+        ):(
+          <Text style={styles.header}>No expense data available</Text>
+        )}
         </TouchableOpacity>
       </View>
     </ScrollView>
