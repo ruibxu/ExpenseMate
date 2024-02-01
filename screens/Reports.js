@@ -5,23 +5,28 @@ import {
   ScrollView,
   Dimensions,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
 } from "react-native";
 import { PieChart } from "react-native-chart-kit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ListItem from "../components/ListItem";
 import { theme } from "../theme";
+import { Picker } from "@react-native-picker/picker";
+
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
 const ReportScreen = () => {
   const [expenses, setExpenses] = useState([]);
-  const [totalAmountSpent, setTotalAmountSpent] = useState(0);
-  // Initialize state for selected month and year
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 2019 }, (_, i) => 2020 + i);
+  const [totalAmountSpent, setTotalAmountSpent] = useState(0);
+  const [categorySummary2, setCategorySummary] = useState({});
+
+  
 
   // Function to handle month selection
   const handleMonthSelect = (month) => {
@@ -34,23 +39,21 @@ const ReportScreen = () => {
   };
 
   // Function to get month name from month number
-  const getMonthName = (monthNumber) => {
-    const months = [
-      "JANUARY",
-      "FEBRUARY",
-      "MARCH",
-      "APRIL",
-      "MAY",
-      "JUNE",
-      "JULY",
-      "AUGUST",
-      "SEPTEMBER",
-      "OCTOBER",
-      "NOVEMBER",
-      "DECEMBER",
-    ];
-    return months[monthNumber - 1];
-  };
+
+  const months = [
+    "JANUARY",
+    "FEBRUARY",
+    "MARCH",
+    "APRIL",
+    "MAY",
+    "JUNE",
+    "JULY",
+    "AUGUST",
+    "SEPTEMBER",
+    "OCTOBER",
+    "NOVEMBER",
+    "DECEMBER",
+  ];
 
   useEffect(() => {
     // Function to retrieve expenses data from local storage
@@ -103,6 +106,10 @@ const ReportScreen = () => {
     return doughnutChartData;
   };
 
+  
+
+
+  
   // Function to calculate total expenses and percentages by category
   const calculateCategorySummary = () => {
     const categorySummary = {};
@@ -141,7 +148,7 @@ const ReportScreen = () => {
   // Calculate total amount spent whenever expenses change
   useEffect(() => {
     let total = 0;
-    expenses.forEach(expense => {
+    expenses.forEach((expense) => {
       total += expense.amount;
     });
     setTotalAmountSpent(total);
@@ -154,100 +161,147 @@ const ReportScreen = () => {
     setSummaryExpanded(!summaryExpanded);
   };
 
+  
+
   return (
     <ScrollView>
-    <View style={{ flex: 1 }}>
-      <View style={styles.filterContainer}>
-        <Text style={styles.header}>{`${getMonthName(
-          selectedMonth
-        )} ${selectedYear}`}</Text>
-        <TouchableOpacity onPress={() => handleMonthSelect(selectedMonth + 1)}>
-          <MaterialCommunityIcons
-            name="calendar-search"
-            size={34}
-            color="white"
-          />
-        </TouchableOpacity>
-      </View>
+      <View style={{ flex: 1 }}>
+        <View style={styles.filterContaine}>
+          <Text style={styles.title}>Month: {months[selectedMonth - 1]}</Text>
+          <Text style={styles.title}>Year: {selectedYear}</Text>
 
-      {/* Render the pie chart */}
-      {!summaryExpanded && (
-        <View style={styles.piechart}>
-          {expenses.length > 0 ? (
-            <PieChart
-              data={prepareChartData()}
-              width={width}
-              height={220}
-              chartConfig={{
-                backgroundColor: "#ffffff",
-                decimalPlaces: 2,
-                color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                style: {
-                  borderRadius: 16,
-                },
-              }}
-              accessor="value"
-              backgroundColor="transparent"
-              paddingLeft="15"
-              hasLegend={true} 
-              center={[10, 10]}
-              absolute 
-            />
-          ) : (
-            <Text style={styles.header}>No expenses data available</Text>
-          )}
-        </View>
-      )}
-            <Text style={{ color:'white',textAlign:'center',paddingBottom:35,fontSize:20 }}>Total: ${totalAmountSpent}</Text>
-      {/* Render the summary view */}
-      <TouchableOpacity onPress={toggleSummary} >
-        <View style={[styles.summary, summaryExpanded && styles.expandedSummary]}>
-          <View
-            style={{
-              flexDirection: "column",
-              alignItems: "center",
-              paddingTop: 15,
-            }}
-          >
-            <View style={styles.line}></View>
-            <Text style={styles.header}>SUMMARY</Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={styles.title}>Month:</Text>
+            <Picker
+              selectedValue={selectedMonth}
+              style={{ height: 50, width: 300, color: "white" }}
+              onValueChange={(itemValue) => handleMonthSelect(itemValue)}
+            >
+              {months.map((month, index) => (
+                <Picker.Item label={month} value={index + 1} key={month} />
+              ))}
+            </Picker>
           </View>
 
-          <View style={styles.titleArrange}>
-            <Text style={styles.title}>Category</Text>
-            <Text style={styles.title}>Percentage</Text>
-            <Text style={styles.title}>Amount</Text>
-          </View>
-          <ScrollView>
-            <View>
-              {Object.keys(categorySummary).map((category) => (
-                <ListItem
-                  key={category}
-                  detail={<Text></Text>}
-                  label={
-                    <Text
-                      style={{
-                        color: categorySummary[category].color,
-                        width: 120,
-                      }}
-                    >
-                      {category}
-                    </Text>
-                  }
-                  // Calculate percentage and value for each category
-                  subtitle={`$ ${categorySummary[category].value.toFixed(2)}`}
-                  percentage={`${categorySummary[category].percentage.toFixed(
-                    2
-                  )}% `}
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={styles.title}>Year:</Text>
+            <Picker
+              selectedValue={selectedYear}
+              style={{ height: 50, width: 200, color: "white" }}
+              onValueChange={(itemValue) => handleYearSelect(itemValue)}
+            >
+              {years.map((year) => (
+                <Picker.Item
+                  label={year.toString()}
+                  value={year}
+                  key={year.toString()}
                 />
               ))}
-            </View>
-          </ScrollView>
+            </Picker>
+          </View>
+          {/* <Text style={styles.header}>{`${getMonthName(
+            selectedMonth
+          )} ${selectedYear}`}</Text>
+          <TouchableOpacity
+            onPress={() => handleMonthSelect(selectedMonth + 1)}
+          >
+            <MaterialCommunityIcons
+              name="calendar-search"
+              size={34}
+              color="white"
+            />
+          </TouchableOpacity> */}
         </View>
-      </TouchableOpacity>
-    </View>
-  </ScrollView>
+
+        {/* Render the pie chart */}
+        {!summaryExpanded && (
+          <View style={styles.piechart}>
+            {expenses.length > 0 ? (
+              <PieChart
+                data={prepareChartData()}
+                width={width}
+                height={220}
+                chartConfig={{
+                  backgroundColor: "#ffffff",
+                  decimalPlaces: 2,
+                  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  style: {
+                    borderRadius: 16,
+                  },
+                }}
+                accessor="value"
+                backgroundColor="transparent"
+                paddingLeft="15"
+                hasLegend={true}
+                center={[10, 10]}
+                absolute
+              />
+            ) : (
+              <Text style={styles.header}>No expenses data available</Text>
+            )}
+          </View>
+        )}
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            paddingBottom: 35,
+            fontSize: 20,
+          }}
+        >
+          Total: ${totalAmountSpent}
+        </Text>
+        {/* Render the summary view */}
+        <TouchableOpacity onPress={toggleSummary}>
+          <View
+            style={[styles.summary, summaryExpanded && styles.expandedSummary]}
+          >
+            <View
+              style={{
+                flexDirection: "column",
+                alignItems: "center",
+                paddingTop: 15,
+              }}
+            >
+              <View style={styles.line}></View>
+              <Text style={styles.header}>SUMMARY</Text>
+            </View>
+
+            <View style={styles.titleArrange}>
+              <Text style={styles.title}>Category</Text>
+              <Text style={styles.title}>Percentage</Text>
+              <Text style={styles.title}>Amount</Text>
+            </View>
+            <ScrollView>
+              <View>
+                {Object.keys(categorySummary).map((category) => (
+                  <ListItem
+                    key={category}
+                    detail={<Text></Text>}
+                    label={
+                      <Text
+                        style={{
+                          color: categorySummary[category].color,
+                          width: 120,
+                        }}
+                      >
+                        {category}
+                      </Text>
+                    }
+                    // Calculate percentage and value for each category
+                    subtitle={`$ ${categorySummary[category].value.toFixed(2)}`}
+                    percentage={`${categorySummary[category].percentage.toFixed(
+                      2
+                    )}% `}
+                  />
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
