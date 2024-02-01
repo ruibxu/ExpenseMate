@@ -75,9 +75,16 @@ const ReportScreen = () => {
   // Function to prepare data for the doughnut chart
   const prepareChartData = () => {
     const categoryData = {};
-
-    // Aggregate expenses data by category and calculate total amount spent
-    expenses.forEach((expense) => {
+  
+    // Filter expenses by selected month and year
+    const filteredExpenses = expenses.filter(expense => {
+      // Split the date string and extract month, day, and year
+      const [month, day, year] = expense.date.split('/').map(Number);
+      return month === selectedMonth && year === selectedYear;
+    });
+  
+    // Aggregate filtered expenses data by category and calculate total amount spent
+    filteredExpenses.forEach((expense) => {
       const { category, amount } = expense;
       if (category && category.label) {
         // Check if category and label are defined
@@ -93,7 +100,7 @@ const ReportScreen = () => {
         }
       }
     });
-
+  
     // Convert aggregated data to format suitable for pie chart
     const doughnutChartData = Object.keys(categoryData).map((label) => ({
       name: label,
@@ -102,10 +109,11 @@ const ReportScreen = () => {
       legendFontColor: categoryData[label].legendFontColor,
       legendFontSize: categoryData[label].legendFontSize,
     }));
-
+  
     return doughnutChartData;
   };
 
+  
   
 
 
