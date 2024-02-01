@@ -26,8 +26,6 @@ const ReportScreen = () => {
   const [totalAmountSpent, setTotalAmountSpent] = useState(0);
   const [categorySummary2, setCategorySummary] = useState({});
 
-  
-
   // Function to handle month selection
   const handleMonthSelect = (month) => {
     setSelectedMonth(month);
@@ -75,14 +73,14 @@ const ReportScreen = () => {
   // Function to prepare data for the doughnut chart
   const prepareChartData = () => {
     const categoryData = {};
-  
+
     // Filter expenses by selected month and year
-    const filteredExpenses = expenses.filter(expense => {
+    const filteredExpenses = expenses.filter((expense) => {
       // Split the date string and extract month, day, and year
-      const [month, day, year] = expense.date.split('/').map(Number);
+      const [month, day, year] = expense.date.split("/").map(Number);
       return month === selectedMonth && year === selectedYear;
     });
-  
+
     // Aggregate filtered expenses data by category and calculate total amount spent
     filteredExpenses.forEach((expense) => {
       const { category, amount } = expense;
@@ -100,7 +98,7 @@ const ReportScreen = () => {
         }
       }
     });
-  
+
     // Convert aggregated data to format suitable for pie chart
     const doughnutChartData = Object.keys(categoryData).map((label) => ({
       name: label,
@@ -109,15 +107,10 @@ const ReportScreen = () => {
       legendFontColor: categoryData[label].legendFontColor,
       legendFontSize: categoryData[label].legendFontSize,
     }));
-  
+
     return doughnutChartData;
   };
 
-  
-  
-
-
-  
   // Function to calculate total expenses and percentages by category
   const calculateCategorySummary = () => {
     const categorySummary = {};
@@ -153,14 +146,23 @@ const ReportScreen = () => {
   const categorySummary = calculateCategorySummary();
   console.log(categorySummary);
 
-  // Calculate total amount spent whenever expenses change
   useEffect(() => {
+    // Filter expenses by selected month and year
+    const filteredExpenses = expenses.filter(expense => {
+      const [month, day, year] = expense.date.split('/').map(Number);
+      return month === selectedMonth && year === selectedYear;
+    });
+  
+    // Calculate total amount spent for the filtered expenses
     let total = 0;
-    expenses.forEach((expense) => {
+    filteredExpenses.forEach((expense) => {
       total += expense.amount;
     });
+  
+    // Update the total amount spent state
     setTotalAmountSpent(total);
-  }, [expenses]);
+  }, [expenses, selectedMonth, selectedYear]);
+  
 
   const [summaryExpanded, setSummaryExpanded] = useState(false);
 
@@ -168,8 +170,6 @@ const ReportScreen = () => {
   const toggleSummary = () => {
     setSummaryExpanded(!summaryExpanded);
   };
-
-  
 
   return (
     <ScrollView>
