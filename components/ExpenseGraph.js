@@ -7,16 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
-import {
-  startOfWeek,
-  endOfWeek,
-  startOfMonth,
-  endOfMonth,
-  startOfYear,
-  endOfYear,
-  format,
-  isSameMonth,
-} from "date-fns";
+import { startOfWeek, format, isSameMonth, startOfMonth, isSameYear } from "date-fns";
 
 const ExpenseGraph = ({ data }) => {
   const [period, setPeriod] = useState("month");
@@ -41,6 +32,9 @@ const ExpenseGraph = ({ data }) => {
   }, []);
 
   const organizeData = (expenseData, period) => {
+    console.log("Input data:", expenseData);
+    console.log("Selected period:", period);
+
     let groupedData = {};
 
     expenseData.forEach((expense) => {
@@ -49,7 +43,7 @@ const ExpenseGraph = ({ data }) => {
 
       switch (period) {
         case "day":
-          key = startOfMonth(date).toISOString();
+          key = startOfWeek(date, { weekStartsOn: 1 }).toISOString();
           break;
         case "week":
           key = startOfWeek(date, { weekStartsOn: 1 }).toISOString();
@@ -63,7 +57,7 @@ const ExpenseGraph = ({ data }) => {
           }
           break;
         default:
-          key = startOfMonth(date).toISOString();
+          key = startOfWeek(date, { weekStartsOn: 1 }).toISOString();
       }
 
       if (key) {
@@ -86,19 +80,47 @@ const ExpenseGraph = ({ data }) => {
           };
         })
         .filter((dataPoint) => isSameMonth(dataPoint.date, new Date()))
+        .sort((a, b) => a.date - b.date)
         .slice(0, 5);
+
+      console.log("Data organized by month:", currentMonthData);
 
       result = currentMonthData;
     } else if (period === "year") {
-      result = Object.keys(groupedData)
+      const currentYearData = Object.keys(groupedData)
         .map((key) => {
           return {
             date: new Date(key),
             expenses: groupedData[key],
           };
         })
+        .filter((dataPoint) => isSameYear(dataPoint.date, new Date()))
+        .reduce((acc, dataPoint) => {
+          const monthIndex = dataPoint.date.getMonth();
+          const existingData = acc[monthIndex];
+
+          if (!existingData) {
+            acc[monthIndex] = {
+              date: dataPoint.date,
+              expenses: dataPoint.expenses,
+            };
+          } else {
+            existingData.expenses = existingData.expenses.concat(
+              dataPoint.expenses
+            );
+          }
+
+          return acc;
+        }, [])
+        .filter((dataPoint) => dataPoint !== undefined)
         .sort((a, b) => a.date - b.date);
+
+      console.log("Data organized by year:", currentYearData);
+
+      result = currentYearData;
     }
+
+    console.log("Final result:", result);
 
     return result;
   };
@@ -117,7 +139,7 @@ const ExpenseGraph = ({ data }) => {
         style={{
           flexDirection: "row",
           justifyContent: "space-evenly",
-          marginBottom: 25
+          marginBottom: 25,
         }}
       >
         <TouchableOpacity
@@ -185,9 +207,9 @@ const ExpenseGraph = ({ data }) => {
 const styles = StyleSheet.create({
   button: {
     backgroundColor: "#2d2b3b",
-    height: "38px",
-    width: "161px",
-    borderRadius: "10px",
+    height: 38,
+    width: 161,
+    borderRadius: 10,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -200,11 +222,11 @@ const styles = StyleSheet.create({
   textButton: {
     color: "#FFFFFF",
     textTransform: "uppercase",
-    fontSize: "20px",
+    fontSize: 20,
   },
   container: {
     overflow: "hidden",
-  }
+  },
 });
 
 export default ExpenseGraph;
