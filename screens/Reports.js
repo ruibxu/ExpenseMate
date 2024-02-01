@@ -12,17 +12,49 @@ import { PieChart } from "react-native-chart-kit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ListItem from "../components/ListItem";
 import { theme } from "../theme";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
 const ReportScreen = () => {
   const [expenses, setExpenses] = useState([]);
+  // Initialize state for selected month and year
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
+  // Function to handle month selection
+  const handleMonthSelect = (month) => {
+    setSelectedMonth(month);
+  };
+
+  // Function to handle year selection
+  const handleYearSelect = (year) => {
+    setSelectedYear(year);
+  };
+
+  // Function to get month name from month number
+  const getMonthName = (monthNumber) => {
+    const months = [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER",
+    ];
+    return months[monthNumber - 1];
+  };
 
   useEffect(() => {
     // Function to retrieve expenses data from local storage
     const fetchExpenses = async () => {
       try {
-        // Fetch expenses data from local storage (implement your own logic)
         const expensesData = await AsyncStorage.getItem("expenses");
         if (expensesData) {
           const parsedExpenses = JSON.parse(expensesData);
@@ -105,37 +137,31 @@ const ReportScreen = () => {
   const categorySummary = calculateCategorySummary();
   console.log(categorySummary);
 
-  // filtering
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [filteredCategorySummary, setFilteredCategorySummary] =
-    useState(categorySummary);
+  const [summaryExpanded, setSummaryExpanded] = useState(false);
 
-  const filterCategoryByDate = () => {
-    const filteredCategories = Object.keys(categorySummary).reduce(
-      (acc, category) => {
-        const categoryDate = new Date(categorySummary[category].date);
-        const startDateObj = startDate ? new Date(startDate) : null;
-        const endDateObj = endDate ? new Date(endDate) : null;
-
-        if (
-          (!startDateObj || categoryDate >= startDateObj) &&
-          (!endDateObj || categoryDate <= endDateObj)
-        ) {
-          acc[category] = categorySummary[category];
-        }
-
-        return acc;
-      },
-      {}
-    );
-
-    setFilteredCategorySummary(filteredCategories);
+  // Define your handle function to toggle summary view
+  const toggleSummary = () => {
+    setSummaryExpanded(!summaryExpanded);
   };
 
   return (
     <ScrollView>
-      <View style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
+      <View style={styles.filterContainer}>
+        <Text style={styles.header}>{`${getMonthName(
+          selectedMonth
+        )} ${selectedYear}`}</Text>
+        <TouchableOpacity onPress={() => handleMonthSelect(selectedMonth + 1)}>
+          <MaterialCommunityIcons
+            name="calendar-search"
+            size={34}
+            color="white"
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* Render the pie chart */}
+      {!summaryExpanded && (
         <View style={styles.piechart}>
           {expenses.length > 0 ? (
             <PieChart
@@ -154,56 +180,35 @@ const ReportScreen = () => {
               accessor="value"
               backgroundColor="transparent"
               paddingLeft="15"
-              hasLegend={true} // Enable legend to make the chart a doughnut chart
-              center={[10, 10]} // Adjust the center to create a doughnut chart effect
-              absolute // Render values as absolute numbers
+              hasLegend={true} 
+              center={[10, 10]}
+              absolute 
             />
           ) : (
             <Text>No expenses data available</Text>
           )}
         </View>
-
-        <ScrollView>
-          <View style={styles.container}>
-            <View style={styles.filterContainer}>
-              <TextInput
-                style={styles.dateInput}
-                placeholder="Start Date (MM/DD/YYYY)"
-                onChangeText={(text) => setStartDate(text)}
-              />
-              <TextInput
-                style={styles.dateInput}
-                placeholder="End Date (MM/DD/YYYY)"
-                onChangeText={(text) => setEndDate(text)}
-              />
-              <TouchableOpacity
-                style={styles.filterButton}
-                onPress={filterCategoryByDate}
-              >
-                <Text style={styles.filterButtonText}>Filter</Text>
-              </TouchableOpacity>
-            </View>
-
-            {Object.keys(filteredCategorySummary).map((category) => (
-              <View key={category} style={styles.categoryItem}>
-                <Text
-                  style={{ color: filteredCategorySummary[category].color }}
-                >
-                  {category}
-                </Text>
-                <Text>{`$ ${filteredCategorySummary[category].value.toFixed(
-                  2
-                )}`}</Text>
-                <Text>{`${filteredCategorySummary[category].percentage.toFixed(
-                  2
-                )}%`}</Text>
-              </View>
-            ))}
+      )}
+            <Text style={{ color:'white',textAlign:'center',paddingBottom:35,fontSize:20 }}>Total: $3425</Text>
+      {/* Render the summary view */}
+      <TouchableOpacity onPress={toggleSummary} >
+        <View style={[styles.summary, summaryExpanded && styles.expandedSummary]}>
+          <View
+            style={{
+              flexDirection: "column",
+              alignItems: "center",
+              paddingTop: 15,
+            }}
+          >
+            <View style={styles.line}></View>
+            <Text style={styles.header}>SUMMARY</Text>
           </View>
-        </ScrollView>
 
-        <View style={styles.summary}>
-          <Text style={styles.header}>SUMMARY</Text>
+          <View style={styles.titleArrange}>
+            <Text style={styles.title}>Category</Text>
+            <Text style={styles.title}>Percentage</Text>
+            <Text style={styles.title}>Amount</Text>
+          </View>
           <ScrollView>
             <View>
               {Object.keys(categorySummary).map((category) => (
@@ -211,7 +216,12 @@ const ReportScreen = () => {
                   key={category}
                   detail={<Text></Text>}
                   label={
-                    <Text style={{ color: categorySummary[category].color }}>
+                    <Text
+                      style={{
+                        color: categorySummary[category].color,
+                        width: 120,
+                      }}
+                    >
                       {category}
                     </Text>
                   }
@@ -225,8 +235,9 @@ const ReportScreen = () => {
             </View>
           </ScrollView>
         </View>
-      </View>
-    </ScrollView>
+      </TouchableOpacity>
+    </View>
+  </ScrollView>
   );
 };
 
@@ -240,10 +251,21 @@ const styles = StyleSheet.create({
     textAlign: "center",
     padding: 14,
   },
+  title: {
+    color: "white",
+    fontSize: 18,
+  },
+  titleArrange: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 16,
+  },
+
   summary: {
     borderRadius: 40,
     backgroundColor: theme.colors.card,
-    paddingBottom: 20,
+    paddingBottom: 80,
     borderWidth: 1,
     borderColor: "white",
     borderTopWidth: 1,
@@ -253,39 +275,21 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: "white",
   },
+  line: {
+    height: 5,
+    width: 60,
+    backgroundColor: "#ccc",
+    marginBottom: 5,
+    borderRadius: 5,
+  },
   container: {
     padding: 10,
   },
   filterContainer: {
     flexDirection: "row",
-    marginBottom: 10,
-  },
-  dateInput: {
-    flex: 1,
-    color:'white',
-    marginRight: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-  },
-  filterButton: {
-    backgroundColor: "#4CAF50",
-    padding: 10,
-    borderRadius: 5,
-    justifyContent: "center",
-  },
-  filterButtonText: {
-    color: "#fff",
-    textAlign: "center",
-  },
-  categoryItem: {
-    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    paddingVertical: 10,
+    marginBottom: 10,
   },
 });
 
