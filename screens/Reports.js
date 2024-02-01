@@ -31,12 +31,6 @@ const ReportScreen = () => {
   const { expenses } = useContext(ExpensesContext);
 
 
-  useEffect(() => {
-
-  }, [expenses]);
-
-
-
   // Function to handle month selection
   const handleMonthSelect = (month) => {
     setSelectedMonth(month);
