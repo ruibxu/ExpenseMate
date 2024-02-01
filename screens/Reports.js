@@ -18,6 +18,7 @@ const { width } = Dimensions.get("window");
 
 const ReportScreen = () => {
   const [expenses, setExpenses] = useState([]);
+  const [totalAmountSpent, setTotalAmountSpent] = useState(0);
   // Initialize state for selected month and year
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -137,6 +138,15 @@ const ReportScreen = () => {
   const categorySummary = calculateCategorySummary();
   console.log(categorySummary);
 
+  // Calculate total amount spent whenever expenses change
+  useEffect(() => {
+    let total = 0;
+    expenses.forEach(expense => {
+      total += expense.amount;
+    });
+    setTotalAmountSpent(total);
+  }, [expenses]);
+
   const [summaryExpanded, setSummaryExpanded] = useState(false);
 
   // Define your handle function to toggle summary view
@@ -185,11 +195,11 @@ const ReportScreen = () => {
               absolute 
             />
           ) : (
-            <Text>No expenses data available</Text>
+            <Text style={styles.header}>No expenses data available</Text>
           )}
         </View>
       )}
-            <Text style={{ color:'white',textAlign:'center',paddingBottom:35,fontSize:20 }}>Total: $3425</Text>
+            <Text style={{ color:'white',textAlign:'center',paddingBottom:35,fontSize:20 }}>Total: ${totalAmountSpent}</Text>
       {/* Render the summary view */}
       <TouchableOpacity onPress={toggleSummary} >
         <View style={[styles.summary, summaryExpanded && styles.expandedSummary]}>
