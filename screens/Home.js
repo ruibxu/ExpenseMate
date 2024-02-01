@@ -28,9 +28,10 @@ const Home = () => {
           headerStyle: {
             backgroundColor: theme.colors.card,
           },
+          tabBarActiveTintColor: theme.colors.activeText,
           headerTitleAlign: 'center',
           tabBarIcon: () => <TabBarIcon name={route.name} />, 
-
+          
         })}
       >
         <Tab.Screen 
