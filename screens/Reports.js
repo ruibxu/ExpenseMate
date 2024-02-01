@@ -13,14 +13,14 @@ import ListItem from "../components/ListItem";
 import { theme } from "../theme";
 import { Picker } from "@react-native-picker/picker";
 import { AntDesign } from '@expo/vector-icons';
-import { ExpensesContext } from "../context/ExpenseReortContext";
+import { ExpensesContext } from "../context/ExpenseReportContext";
+
 
 
 const { width } = Dimensions.get("window");
 
 
 const ReportScreen = () => {
-  const [expenses, setExpenses] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const currentYear = new Date().getFullYear();
@@ -28,7 +28,12 @@ const ReportScreen = () => {
   const [totalAmountSpent, setTotalAmountSpent] = useState(0);
   const [categorySummary, setCategorySummary] = useState({});
 
-  // const { expenses, setExpenses } = useContext(ExpensesContext);
+  const { expenses } = useContext(ExpensesContext);
+
+
+  useEffect(() => {
+
+  }, [expenses]);
 
 
 
@@ -59,23 +64,6 @@ const ReportScreen = () => {
     "DECEMBER",
     
   ];
-
-  useEffect(() => {
-    // Function to retrieve expenses data from local storage
-    const fetchExpenses = async () => {
-      try {
-        const expensesData = await AsyncStorage.getItem("expenses");
-        if (expensesData) {
-          const parsedExpenses = JSON.parse(expensesData);
-          setExpenses(parsedExpenses);
-        }
-      } catch (error) {
-        console.error("Error fetching expenses:", error);
-      }
-    };
-
-    fetchExpenses();
-  }, []);
 
   // Function to prepare data for the doughnut chart
   const prepareChartData = () => {

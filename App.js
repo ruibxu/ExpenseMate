@@ -17,6 +17,7 @@ import { TabBarIcon } from './components/TabBarIcon';
 import Home from './screens/Home';
 
 import { CategoryProvider } from './context/CategoryContext';
+import { ExpensesProvider } from './context/ExpenseReportContext';
 
 
 //create a stack navigator
@@ -27,6 +28,7 @@ export default function App() {
 
   return (
     // react navigation container
+    <ExpensesProvider>
     <CategoryProvider>
       <NavigationContainer theme={theme}>
         <StatusBar style="auto" />
@@ -49,6 +51,7 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </CategoryProvider>
+    </ExpensesProvider>
   );
 }
 
