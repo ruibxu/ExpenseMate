@@ -1,38 +1,32 @@
 import { Picker } from "@react-native-picker/picker";
 import moment from "moment";
 import { useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Platform, StyleSheet, Text, View } from "react-native";
 import { theme } from "../theme";
 
 const Item = ({ amount, date, category }) => (
   <View style={styles.item}>
     <View style={styles.itemCategory}>
       <Text style={styles.text}>{date}</Text>
-      <Text style={styles.textCategory}>{category}</Text>
+      <Text style={styles.textCategory}>{category.label}</Text>
     </View>
     <Text style={styles.text}>${amount}</Text>
   </View>
 );
 
+const filterDataByDateRange = (data, start, end) => {
+  return data.filter((item) =>
+    moment(item.date).isBetween(moment(start).startOf("day"), moment(end).endOf("day"))
+  );
+};
+
 const ExpenseList = ({ data }) => {
   const [selected, setSelected] = useState("last10");
 
   const options = [
-    {
-      _id: "1",
-      label: "Last 10 Record",
-      value: "last10",
-    },
-    {
-      _id: "2",
-      label: "Last Week",
-      value: "lastWeek",
-    },
-    {
-      _id: "3",
-      label: "Last Month",
-      value: "lastMonth",
-    },
+    { _id: "1", label: "Last 10 Records", value: "last10" },
+    { _id: "2", label: "Last Week", value: "lastWeek" },
+    { _id: "3", label: "Last Month", value: "lastMonth" },
   ];
 
   const filteredData = () => {
@@ -40,31 +34,15 @@ const ExpenseList = ({ data }) => {
       case "last10":
         return data.slice(0, 10);
       case "lastWeek":
-        // Filtrar por los gastos de la última semana
-        const lastWeekData = data.filter(
-          (item) =>
-            moment(item.date).isAfter(
-              moment().subtract(1, "weeks").startOf("day")
-            ) && moment(item.date).isBefore(moment().endOf("day"))
-        );
-        return lastWeekData;
+        return filterDataByDateRange(data, moment().subtract(1, "weeks"), moment());
       case "lastMonth":
-        // Filtrar por los gastos del último mes
-        const lastMonthData = data.filter(
-          (item) =>
-            moment(item.date).isAfter(
-              moment().subtract(1, "months").startOf("day")
-            ) && moment(item.date).isBefore(moment().endOf("day"))
-        );
-        return lastMonthData;
+        return filterDataByDateRange(data, moment().subtract(1, "months"), moment());
       default:
         return data;
     }
   };
 
-  const sortedData = filteredData().sort(
-    (a, b) => new Date(b.date) - new Date(a.date)
-  );
+  const sortedData = filteredData().sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const formattedData = sortedData.map((item) => ({
     ...item,
@@ -76,40 +54,80 @@ const ExpenseList = ({ data }) => {
       <View style={styles.containerSummary}>
         <Text style={styles.text1}>Summary</Text>
         <View>
-          <Picker
-            style={{
-              height: 150,
-              width: 200,
-              backgroundColor: "transparent",
-              borderRadius: 10,
-              borderColor: theme.colors.border,
-              borderWidth: 1,
-              marginBottom: 20,
-              display: "flex",
-              justifyContent: "center",
-            }}
-            selectedValue={selected}
-            itemStyle={{
-              height: 150,
-              color: theme.colors.text,
-            }}
-            onValueChange={(itemValue, itemIndex) => {
-              console.log(itemValue);
-              setSelected(itemValue);
-            }}
-          >
-            {options.map((option) => (
-              <Picker.Item
-                key={option._id}
-                style={{
-                  fontSize: 16,
-                  color: theme.colors.text,
-                }}
-                label={option.label}
-                value={option.value}
-              />
-            ))}
-          </Picker>
+          {Platform.OS === "ios" ? (
+            <Picker
+              style={{
+                height: 150,
+                width: 200,
+                backgroundColor: "transparent",
+                borderRadius: 10,
+                borderColor: theme.colors.border,
+                borderWidth: 1,
+                marginBottom: 20,
+                display: "flex",
+                justifyContent: "center",
+              }}
+              selectedValue={selected}
+              itemStyle={{
+                height: 150,
+                color: theme.colors.text,
+              }}
+              onValueChange={(itemValue, itemIndex) => {
+                console.log(itemValue);
+                setSelected(itemValue);
+              }}
+            >
+              {options.map((option) => (
+                <Picker.Item
+                  key={option._id}
+                  style={{
+                    fontSize: 16,
+                    color: theme.colors.text,
+                  }}
+                  label={option.label}
+                  value={option.value}
+                />
+              ))}
+            </Picker>
+          ) : (
+            <Picker
+              style={{
+                height: 150,
+                width: 200,
+                backgroundColor: "transparent",
+                borderRadius: 10,
+                borderColor: theme.colors.border,
+                borderWidth: 1,
+                marginBottom: 20,
+                display: "flex",
+                justifyContent: "center",
+              }}
+              dropdownIconColor={theme.colors.text}
+              mode="dropdown"
+              dropdownIconRippleColor={theme.colors.modal}
+              selectedValue={selected}
+              itemStyle={{
+                height: 150,
+                color: theme.colors.text,
+              }}
+              onValueChange={(itemValue, itemIndex) => {
+                console.log(itemValue);
+                setSelected(itemValue);
+              }}
+            >
+              {options.map((option) => (
+                <Picker.Item
+                  key={option._id}
+                  style={{
+                    fontSize: 16,
+                    color: theme.colors.text,
+                  }}
+                  label={option.label}
+                  value={option.value}
+                />
+              ))}
+            </Picker>
+          )}
         </View>
       </View>
       <View>

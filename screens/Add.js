@@ -34,7 +34,7 @@ import { ExpensesContext } from '../context/ExpenseReportContext';
 //       label: 'Food',
 //       color: '#ff0000',
 //     },
-//
+
 // }
 //
 
