@@ -33,10 +33,6 @@ const ExpenseGraph = ({ data }) => {
     },
   };
 
-  useEffect(() => {
-    setPeriod("month");
-  }, []);
-
   const organizeData = (expenseData, period) => {
     console.log("Input data:", expenseData);
     console.log("Selected period:", period);
@@ -44,9 +40,10 @@ const ExpenseGraph = ({ data }) => {
     let groupedData = {};
 
     expenseData.forEach((expense) => {
-      let date = new Date(expense.date);
+      let dateParts = expense.date.split('/');
+      let date = new Date(`${dateParts[2]}-${dateParts[0]}-${dateParts[1]}`);
       let key;
-
+  
       switch (period) {
         case "day":
           key = startOfWeek(date, { weekStartsOn: 1 }).toISOString();
@@ -65,15 +62,15 @@ const ExpenseGraph = ({ data }) => {
         default:
           key = startOfWeek(date, { weekStartsOn: 1 }).toISOString();
       }
-
+  
       if (key) {
         if (!groupedData[key]) {
           groupedData[key] = [];
         }
-
+  
         groupedData[key].push(expense);
       }
-    });
+  });
 
     let result;
 
@@ -96,7 +93,7 @@ const ExpenseGraph = ({ data }) => {
       let currentWeekStart = startOfWeek(firstDayOfMonth, { weekStartsOn: 1 });
 
       while (currentWeekStart <= lastDayOfMonth) {
-        weeksArray.push(currentWeekStart.toISOString());
+        weeksArray.push(new Date(currentWeekStart)); 
         currentWeekStart.setDate(currentWeekStart.getDate() + 7);
       }
 
