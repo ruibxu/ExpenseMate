@@ -15,13 +15,20 @@ const Item = ({ amount, date, category }) => (
 );
 
 const filterDataByDateRange = (data, start, end) => {
-  return data.filter((item) =>
-    moment(item.date, "MM-DD-YYYY").isBetween(moment(start).startOf("day"), moment(end).endOf("day"), [])
-  );
+  return data.filter((item) => {
+    const itemDate = moment(item.date, "DD/MM/YYYY");
+    console.log("Item Date:", itemDate.format("DD/MM/YYYY"));
+    console.log("Start Date:", moment(start).startOf("day").format("DD/MM/YYYY"));
+    console.log("End Date:", moment(end).endOf("day").format("DD/MM/YYYY"));
+
+    return itemDate.isBetween(moment(start).startOf("day"), moment(end).endOf("day"), null, '[]');
+  });
 };
+
 
 const ExpenseList = ({ data }) => {
   const [selected, setSelected] = useState("last10");
+  console.log(data)
 
   const options = [
     { _id: "1", label: "Last 10 Records", value: "last10" },
@@ -35,8 +42,10 @@ const ExpenseList = ({ data }) => {
         return data.slice(-10).reverse();
       case "lastWeek":
         return filterDataByDateRange(data, moment().subtract(1, "weeks"), moment()).reverse();
-      case "lastMonth":
-        return filterDataByDateRange(data, moment().subtract(1, "months"), moment()).reverse();
+        case "lastMonth":
+          const firstDayOfLastMonth = moment().subtract(1, 'months').startOf('month');
+          const lastDayOfLastMonth = moment().subtract(1, 'months').endOf('month');
+          return filterDataByDateRange(data, firstDayOfLastMonth, lastDayOfLastMonth).reverse();           
       default:
         return data;
     }

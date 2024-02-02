@@ -22,7 +22,7 @@ const ExpenseGraph = ({ data }) => {
   const [isYearPressed, setIsYearPressed] = useState(false);
 
   const screenWidth = Dimensions.get("window").width;
-  const currentYear = new Date().getFullYear(); // Obtener el año actual
+  const currentYear = new Date().getFullYear();
 
   const chartConfig = {
     backgroundGradientFrom: "#020014",
