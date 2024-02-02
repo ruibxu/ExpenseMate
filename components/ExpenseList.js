@@ -8,7 +8,7 @@ const Item = ({ amount, date, category }) => (
   <View style={styles.item}>
     <View style={styles.itemCategory}>
       <Text style={styles.text}>{date}</Text>
-      <Text style={{ ...styles.textCategory, color: category.color }}>{category.label}</Text>
+      <Text style={{ ...styles.textCategory, color: category?.color }}>{category?.label}</Text>
     </View>
     <Text style={styles.text}>${amount}</Text>
   </View>
