@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, ScrollView } from "react-native";
 import React, { useState } from "react";
 import ExpenseGraph from "../components/ExpenseGraph";
 import ExpenseList from "../components/ExpenseList";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Expenses = () => {
   const expenses = [
@@ -253,11 +254,29 @@ const Expenses = () => {
     },
   ];
 
-  const storedExpenses = JSON.parse(localStorage.getItem("expenses"));
+  const getStoredExpenses = async () => {
+    try {
+      const storedExpenses = await AsyncStorage.getItem("expenses");
+      return storedExpenses ? JSON.parse(storedExpenses) : [];
+    } catch (error) {
+      console.error("Error al obtener datos del AsyncStorage:", error);
+      return [];
+    }
+  };
 
-  if (storedExpenses && Array.isArray(storedExpenses)) {
-    expenses.push(...storedExpenses);
-  }
+  const loadExpensesFromStorage = async () => {
+    try {
+      const storedExpenses = await getStoredExpenses();
+
+      expenses.push(...storedExpenses);
+
+      console.log(expenses);
+    } catch (error) {
+      console.error("Error al cargar datos desde AsyncStorage:", error);
+    }
+  };
+
+  loadExpensesFromStorage();
 
   return (
     <ScrollView style={styles.container}>

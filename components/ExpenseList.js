@@ -14,25 +14,19 @@ const Item = ({ amount, date, category }) => (
   </View>
 );
 
+const filterDataByDateRange = (data, start, end) => {
+  return data.filter((item) =>
+    moment(item.date).isBetween(moment(start).startOf("day"), moment(end).endOf("day"))
+  );
+};
+
 const ExpenseList = ({ data }) => {
   const [selected, setSelected] = useState("last10");
 
   const options = [
-    {
-      _id: "1",
-      label: "Last 10 Record",
-      value: "last10",
-    },
-    {
-      _id: "2",
-      label: "Last Week",
-      value: "lastWeek",
-    },
-    {
-      _id: "3",
-      label: "Last Month",
-      value: "lastMonth",
-    },
+    { _id: "1", label: "Last 10 Records", value: "last10" },
+    { _id: "2", label: "Last Week", value: "lastWeek" },
+    { _id: "3", label: "Last Month", value: "lastMonth" },
   ];
 
   const filteredData = () => {
@@ -40,31 +34,15 @@ const ExpenseList = ({ data }) => {
       case "last10":
         return data.slice(0, 10);
       case "lastWeek":
-        // Filtrar por los gastos de la última semana
-        const lastWeekData = data.filter(
-          (item) =>
-            moment(item.date).isAfter(
-              moment().subtract(1, "weeks").startOf("day")
-            ) && moment(item.date).isBefore(moment().endOf("day"))
-        );
-        return lastWeekData;
+        return filterDataByDateRange(data, moment().subtract(1, "weeks"), moment());
       case "lastMonth":
-        // Filtrar por los gastos del último mes
-        const lastMonthData = data.filter(
-          (item) =>
-            moment(item.date).isAfter(
-              moment().subtract(1, "months").startOf("day")
-            ) && moment(item.date).isBefore(moment().endOf("day"))
-        );
-        return lastMonthData;
+        return filterDataByDateRange(data, moment().subtract(1, "months"), moment());
       default:
         return data;
     }
   };
 
-  const sortedData = filteredData().sort(
-    (a, b) => new Date(b.date) - new Date(a.date)
-  );
+  const sortedData = filteredData().sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const formattedData = sortedData.map((item) => ({
     ...item,
