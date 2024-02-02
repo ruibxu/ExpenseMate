@@ -8,7 +8,7 @@ const Expenses = () => {
   const { expenses } = React.useContext(ExpensesContext);
   
   useEffect(() => {
-    console.log('Expenses:', expenses.date);
+    console.log('Expenses:', expenses);
   }, [expenses]);
 
   return (
