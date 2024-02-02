@@ -22,6 +22,7 @@ import { theme } from '../theme';
 import uuid from 'react-native-uuid';
 
 import { CategoryContext } from '../context/CategoryContext';
+import { ExpensesContext } from '../context/ExpenseReportContext';
 
 // sample date modal for a expense
 // {
@@ -33,7 +34,7 @@ import { CategoryContext } from '../context/CategoryContext';
 //       label: 'Food',
 //       color: '#ff0000',
 //     },
-//
+
 // }
 //
 
@@ -44,6 +45,8 @@ const Add = () => {
     const [dateShow, setDateShow] = useState(false); // date show state
     const [selectedCategoryId, setSelectedCategoryId] = useState(''); // category state
     const { categories, setCategories, addCategory, deleteCategory } = useContext(CategoryContext);
+    const { expenses, setExpenses } = useContext(ExpensesContext);
+    
 
 
      useEffect(() => {
@@ -86,6 +89,8 @@ const Add = () => {
             existingData.push(expenseData);
             // Save the updated array back to local storage
             await AsyncStorage.setItem('expenses', JSON.stringify(existingData));
+            // Update the expenses state with the new data
+            setExpenses(existingData);
             console.log('Expense data saved:', expenseData);
 
             setAmount(''); // Clear the amount field
@@ -220,7 +225,7 @@ const Add = () => {
                                         alignItems: 'center',
                                         }}
                                     >
-                                        <Text style={{ fontSize: 16, color: theme.colors.primary }}>
+                                        <Text style={{ fontSize: 16, color: theme.colors.activeText }}>
                                         {date.toDateString()}
                                         </Text>
                                     </TouchableOpacity>

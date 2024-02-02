@@ -174,7 +174,7 @@ const Categories = ({}) => {
 
                             <TouchableOpacity
                                 style={{
-                                    backgroundColor: theme.colors.primary,
+                                    backgroundColor: theme.colors.activeText,
                                     padding: 15,
                                     borderRadius: 10,
                                     justifyContent: 'flex-end',
