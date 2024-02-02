@@ -13,6 +13,7 @@ import {
   isSameMonth,
   startOfMonth,
   isSameYear,
+  startOfDay,
 } from "date-fns";
 
 const ExpenseGraph = ({ data }) => {
@@ -40,10 +41,10 @@ const ExpenseGraph = ({ data }) => {
     let groupedData = {};
 
     expenseData.forEach((expense) => {
-      let dateParts = expense.date.split('/');
+      let dateParts = expense.date.split("/");
       let date = new Date(`${dateParts[2]}-${dateParts[0]}-${dateParts[1]}`);
       let key;
-  
+
       switch (period) {
         case "day":
           key = startOfWeek(date, { weekStartsOn: 1 }).toISOString();
@@ -62,15 +63,15 @@ const ExpenseGraph = ({ data }) => {
         default:
           key = startOfWeek(date, { weekStartsOn: 1 }).toISOString();
       }
-  
+
       if (key) {
         if (!groupedData[key]) {
           groupedData[key] = [];
         }
-  
+
         groupedData[key].push(expense);
       }
-  });
+    });
 
     let result;
 
@@ -83,6 +84,9 @@ const ExpenseGraph = ({ data }) => {
           };
         })
         .sort((a, b) => a.date - b.date);
+      allMonthData.forEach((dataPoint) => {
+        console.log(dataPoint);
+      });
 
       const firstDayOfMonth = startOfMonth(new Date());
       const lastDayOfMonth = new Date(firstDayOfMonth);
@@ -91,18 +95,27 @@ const ExpenseGraph = ({ data }) => {
 
       const weeksArray = [];
       let currentWeekStart = startOfWeek(firstDayOfMonth, { weekStartsOn: 1 });
+      console.log(currentWeekStart);
+      console.log(lastDayOfMonth);
 
       while (currentWeekStart <= lastDayOfMonth) {
-        weeksArray.push(new Date(currentWeekStart)); 
+        weeksArray.push(new Date(currentWeekStart));
         currentWeekStart.setDate(currentWeekStart.getDate() + 7);
       }
 
+      console.log(weeksArray);
+
       result = weeksArray.map((weekStart) => {
         const weekData = allMonthData.find(
-          (dataPoint) => dataPoint.date.toISOString() === weekStart
+          (dataPoint) =>
+            dataPoint.date.toISOString() === startOfDay(weekStart).toISOString()
         );
 
         return weekData || { date: new Date(weekStart), expenses: [] };
+      });
+
+      result.forEach((dataPoint) => {
+        console.log(dataPoint);
       });
     } else if (period === "year") {
       const currentYearData = Object.keys(groupedData)
@@ -116,7 +129,7 @@ const ExpenseGraph = ({ data }) => {
         .reduce((acc, dataPoint) => {
           const monthIndex = dataPoint.date.getMonth();
           const existingData = acc[monthIndex];
-  
+
           if (!existingData) {
             acc[monthIndex] = {
               date: dataPoint.date,
@@ -127,14 +140,14 @@ const ExpenseGraph = ({ data }) => {
               dataPoint.expenses
             );
           }
-  
+
           return acc;
         }, [])
         .filter((dataPoint) => dataPoint !== undefined)
         .sort((a, b) => a.date - b.date);
-  
+
       console.log("Data organized by year:", currentYearData);
-  
+
       result = currentYearData;
     }
 
@@ -200,7 +213,7 @@ const ExpenseGraph = ({ data }) => {
           width={screenWidth}
           height={220}
           yAxisLabel="$"
-          yAxisSuffix="k"
+          yAxisSuffix=""
           yAxisInterval={1}
           chartConfig={chartConfig}
           bezier
