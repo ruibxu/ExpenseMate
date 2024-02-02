@@ -1,14 +1,14 @@
 import { Picker } from "@react-native-picker/picker";
 import moment from "moment";
 import { useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Platform, StyleSheet, Text, View } from "react-native";
 import { theme } from "../theme";
 
 const Item = ({ amount, date, category }) => (
   <View style={styles.item}>
     <View style={styles.itemCategory}>
       <Text style={styles.text}>{date}</Text>
-      <Text style={styles.textCategory}>{category}</Text>
+      <Text style={styles.textCategory}>{category.label}</Text>
     </View>
     <Text style={styles.text}>${amount}</Text>
   </View>
@@ -76,40 +76,80 @@ const ExpenseList = ({ data }) => {
       <View style={styles.containerSummary}>
         <Text style={styles.text1}>Summary</Text>
         <View>
-          <Picker
-            style={{
-              height: 150,
-              width: 200,
-              backgroundColor: "transparent",
-              borderRadius: 10,
-              borderColor: theme.colors.border,
-              borderWidth: 1,
-              marginBottom: 20,
-              display: "flex",
-              justifyContent: "center",
-            }}
-            selectedValue={selected}
-            itemStyle={{
-              height: 150,
-              color: theme.colors.text,
-            }}
-            onValueChange={(itemValue, itemIndex) => {
-              console.log(itemValue);
-              setSelected(itemValue);
-            }}
-          >
-            {options.map((option) => (
-              <Picker.Item
-                key={option._id}
-                style={{
-                  fontSize: 16,
-                  color: theme.colors.text,
-                }}
-                label={option.label}
-                value={option.value}
-              />
-            ))}
-          </Picker>
+          {Platform.OS === "ios" ? (
+            <Picker
+              style={{
+                height: 150,
+                width: 200,
+                backgroundColor: "transparent",
+                borderRadius: 10,
+                borderColor: theme.colors.border,
+                borderWidth: 1,
+                marginBottom: 20,
+                display: "flex",
+                justifyContent: "center",
+              }}
+              selectedValue={selected}
+              itemStyle={{
+                height: 150,
+                color: theme.colors.text,
+              }}
+              onValueChange={(itemValue, itemIndex) => {
+                console.log(itemValue);
+                setSelected(itemValue);
+              }}
+            >
+              {options.map((option) => (
+                <Picker.Item
+                  key={option._id}
+                  style={{
+                    fontSize: 16,
+                    color: theme.colors.text,
+                  }}
+                  label={option.label}
+                  value={option.value}
+                />
+              ))}
+            </Picker>
+          ) : (
+            <Picker
+              style={{
+                height: 150,
+                width: 200,
+                backgroundColor: "transparent",
+                borderRadius: 10,
+                borderColor: theme.colors.border,
+                borderWidth: 1,
+                marginBottom: 20,
+                display: "flex",
+                justifyContent: "center",
+              }}
+              dropdownIconColor={theme.colors.text}
+              mode="dropdown"
+              dropdownIconRippleColor={theme.colors.modal}
+              selectedValue={selected}
+              itemStyle={{
+                height: 150,
+                color: theme.colors.text,
+              }}
+              onValueChange={(itemValue, itemIndex) => {
+                console.log(itemValue);
+                setSelected(itemValue);
+              }}
+            >
+              {options.map((option) => (
+                <Picker.Item
+                  key={option._id}
+                  style={{
+                    fontSize: 16,
+                    color: theme.colors.text,
+                  }}
+                  label={option.label}
+                  value={option.value}
+                />
+              ))}
+            </Picker>
+          )}
         </View>
       </View>
       <View>

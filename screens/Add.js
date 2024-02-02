@@ -33,7 +33,7 @@ import { CategoryContext } from '../context/CategoryContext';
 //       label: 'Food',
 //       color: '#ff0000',
 //     },
-//
+
 // }
 //
 
