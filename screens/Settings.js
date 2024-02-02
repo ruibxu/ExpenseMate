@@ -1,11 +1,15 @@
 import { View, Alert } from 'react-native';
-import React from 'react'
+import React,{useContext} from 'react'
 import ListItem from '../components/ListItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AntDesign } from '@expo/vector-icons';
 import { theme } from '../theme';
 
+import { ExpensesContext } from '../context/ExpenseReportContext';
+
 const Settings = ({ navigation }) => {
+
+    const { setExpenses } = useContext(ExpensesContext);
 
     const createAlert = () =>
     Alert.alert('Clear your data', 'This will clear all your expense data, and this is irreversible', [
@@ -20,6 +24,7 @@ const Settings = ({ navigation }) => {
     const handleClearLocalStorage = async () => {
         try {
           await AsyncStorage.removeItem('expenses');
+          setExpenses([]);
           console.log('Local storage "expenses" cleared successfully.');
         } catch (error) {
           console.error('Error clearing local storage:', error);

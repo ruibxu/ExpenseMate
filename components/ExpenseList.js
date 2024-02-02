@@ -8,7 +8,7 @@ const Item = ({ amount, date, category }) => (
   <View style={styles.item}>
     <View style={styles.itemCategory}>
       <Text style={styles.text}>{date}</Text>
-      <Text style={styles.textCategory}>{category.label}</Text>
+      <Text style={{ ...styles.textCategory, color: category.color }}>{category.label}</Text>
     </View>
     <Text style={styles.text}>${amount}</Text>
   </View>
@@ -16,7 +16,7 @@ const Item = ({ amount, date, category }) => (
 
 const filterDataByDateRange = (data, start, end) => {
   return data.filter((item) =>
-    moment(item.date).isBetween(moment(start).startOf("day"), moment(end).endOf("day"))
+    moment(item.date, "MM-DD-YYYY").isBetween(moment(start).startOf("day"), moment(end).endOf("day"), [])
   );
 };
 
@@ -32,22 +32,22 @@ const ExpenseList = ({ data }) => {
   const filteredData = () => {
     switch (selected) {
       case "last10":
-        return data.slice(0, 10);
+        return data.slice(-10).reverse();
       case "lastWeek":
-        return filterDataByDateRange(data, moment().subtract(1, "weeks"), moment());
+        return filterDataByDateRange(data, moment().subtract(1, "weeks"), moment()).reverse();
       case "lastMonth":
-        return filterDataByDateRange(data, moment().subtract(1, "months"), moment());
+        return filterDataByDateRange(data, moment().subtract(1, "months"), moment()).reverse();
       default:
         return data;
     }
   };
 
-  const sortedData = filteredData().sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  const formattedData = sortedData.map((item) => ({
+  const formattedData = filteredData().map((item) => ({
     ...item,
-    date: moment(item.date).format("DD.MM.YYYY"),
+    date: moment(item.date, "MM-DD-YYYY").format("MM/DD/YYYY"),
   }));
+  
 
   return (
     <View>
@@ -101,6 +101,7 @@ const ExpenseList = ({ data }) => {
                 marginBottom: 20,
                 display: "flex",
                 justifyContent: "center",
+                colorBackgroundFloating: theme.colors.card,
               }}
               dropdownIconColor={theme.colors.text}
               mode="dropdown"
@@ -121,6 +122,8 @@ const ExpenseList = ({ data }) => {
                   style={{
                     fontSize: 16,
                     color: theme.colors.text,
+                    backgroundColor: "#2d2b3b",
+                    
                   }}
                   label={option.label}
                   value={option.value}
@@ -139,10 +142,10 @@ const ExpenseList = ({ data }) => {
         <View style={styles.containerList}>
           {formattedData.map((item) => (
             <Item
+              key={item._id}
               amount={item.amount}
               date={item.date}
               category={item.category}
-              key={item.id}
             />
           ))}
         </View>
