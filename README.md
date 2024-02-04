@@ -21,6 +21,9 @@ ExpenseMate simplifies financial management by allowing you to customize your ex
 2. Use "npm install" to install the dependencies
 3. Use "npx expo start" to Run the application
 
+## Demo
+
+
 ## License
 
 This project is licensed under the terms of the Mozilla Public License Version 2.0.
