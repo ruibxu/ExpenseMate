@@ -22,7 +22,11 @@ ExpenseMate simplifies financial management by allowing you to customize your ex
 3. Use "npx expo start" to Run the application
 
 ## Demo
-[ExpenseMate demo.webm](https://github.com/ruibxu/ExpenseMate/assets/71110725/0edd6423-0fa0-42f7-8a1c-a359ec704ba4)
+
+
+https://github.com/ruibxu/ExpenseMate/assets/71110725/371f93ea-a24d-4183-88ab-26c8bf718e0c
+
+
 
 
 ## License
