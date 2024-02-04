@@ -371,26 +371,7 @@ const Add = () => {
                             
                         >Add Expense </Text>
                     </TouchableOpacity>
-                    
-                    <TouchableOpacity                         
-                        style={{
-                        marginBottom: 12,
-                        backgroundColor: theme.colors.primary,
-                        borderRadius: 10,
-                        height: 50,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',}}
-                        onPress={debugButtonPress}
-                    >
-                        <Text
-                            style={{
-                                fontSize: 16,
-                                color: theme.colors.text,
-                            }}
-                           
-                        >Debug</Text>
-                    </TouchableOpacity>
+                
 
                 </View>
             </KeyboardAvoidingView>
