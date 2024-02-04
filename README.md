@@ -23,4 +23,4 @@ ExpenseMate simplifies financial management by allowing you to customize your ex
 
 ## License
 
-This project is licensed under the terms of the MIT license.
+This project is licensed under the terms of the Mozilla Public License Version 2.0.
